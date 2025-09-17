@@ -1,13 +1,26 @@
-import { createTodo } from './api/api';
-import s from './App.module.scss';
+import { useState, useEffect} from 'react';
+import { createTodo, getAllTodos } from './api/api';
+import TodoList from './components/todo-list/todo-list';
+import Todo from './components/todo/todo';
 import Button from './components/button/button'
 import Input from './components/input/input'
-import { useState, } from 'react';
+import s from './App.module.scss';
+
 
 
 function App() {
   const [name, setName] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
+  const [todos, setTodos] = useState(null);
+
+  useEffect(() => {
+    getAllTodos().then(allTodos => {
+      setTodos(allTodos.data);
+    });
+  }, []);
+
+
+  console.log('todos: ', todos);
 
   const getValidation = (str: string) => {
 
@@ -69,6 +82,9 @@ function App() {
           />
           <Button text="Add" type="submit"/>
         </form>
+
+        { todos ? <TodoList todos={todos}/> : <></>}
+        {/* <Todo isDone={false} title='dnjkfhndkjf'/> */}
       </div>
     </div>
   )

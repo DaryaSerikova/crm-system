@@ -5,6 +5,13 @@ interface ITodo {
   title: string,
 }
 
+// interface IFullTodo {
+//   created: string,
+//   id: 0,
+//   isDone: true,
+//   title: string
+// }
+
 export const getAllTodos = async () => {
   try {
     const response = await fetch(`${baseUrl}/todos`);
