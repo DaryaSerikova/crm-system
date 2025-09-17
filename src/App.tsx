@@ -26,17 +26,17 @@ function App() {
     }
   }
 
-  const handleForm = (e) => {
+  const handleForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formElement = e.target;
+    const formElement = e.currentTarget;
+
     const formData = new FormData(formElement); 
-    const titleValue = formData.get('title')?.trim();
-    
+    const titleValue = formData.get('title')?.toString().trim() || '';
     const isValid = getValidation(titleValue);
 
-    console.log('titleValue: ', titleValue);
-    console.log('isValid: ', isValid)
+    // console.log('titleValue: ', titleValue);
+    // console.log('isValid: ', isValid)
 
 
     if (isValid) {
@@ -47,7 +47,6 @@ function App() {
         title: titleValue
       }
       createTodo(todo);
-      
       // formElement.reset();
       setName('');
     }

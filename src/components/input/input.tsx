@@ -2,10 +2,10 @@ import s from './input.module.scss';
 
 
 interface IInput {
-  error?: string,
+  error: string | null,
   name: string,
   value: string,
-  onChange: (e: React.ChangeEvent) => void,
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
 }
 
 const Input = (props: IInput) => {

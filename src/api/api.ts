@@ -1,5 +1,9 @@
 const baseUrl = 'https://easydev.club/api/v1';
 
+interface ITodo {
+  isDone: boolean,
+  title: string,
+}
 
 export const getAllTodos = async () => {
   try {
@@ -11,10 +15,9 @@ export const getAllTodos = async () => {
   }
 }
 
-export const createTodo = async (todo) => {
+export const createTodo = async (todo: ITodo) => {
   try {
-    console.log('createTodo, try: ')
-    console.log('todo: ', todo)
+    // console.log('todo: ', todo)
 
     const response = await fetch(`${baseUrl}/todos`, {
       method: 'POST',
@@ -25,7 +28,7 @@ export const createTodo = async (todo) => {
 
     });
     const newTodo = await response.json();
-    console.log(newTodo);
+    // console.log(newTodo);
     return newTodo;
 
   } catch (err) {
