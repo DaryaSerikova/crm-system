@@ -3,20 +3,22 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 10px 15px;
 
-  // width: 100%;
-  width: 500px;
-  background-color: gray;
+  width: 100%;
+  background-color: #ffffff;
+  box-shadow: 3px 3px 11px rgb(215 215 215);
+  border-radius: 10px;
 
   .todo {
     display: flex;
     flex-direction: row;
+    gap: 10px;
   }
 
   .buttons {
     display: flex;
     flex-direction: row;
-    gap: 7px;
+    gap: 10px;
   }
 }
