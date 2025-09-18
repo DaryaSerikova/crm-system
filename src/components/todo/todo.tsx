@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Button from '../button/button';
 import s from './todo.module.scss';
 import { deleteTodo, editTodo } from '../../api/api';
+import Input from '../input/input';
 
 
 export interface IFullTodo {
@@ -34,39 +35,56 @@ const Todo = (props: IFullTodo) => {
 
 
   return (
-    <div className={s.wrapperTodo}>
-      <div className={s.todo}>
-        <input 
-          type="checkbox" 
-          className={s.checkbox} 
-          checked={checked} 
-          onChange={() => handleToggle()}
-        />
-        <div className={`${s.title} ${checked ? s.titleIsDone : ''}`}>{title}</div>
-      </div>
-      <div className={s.buttons}>
-        {isEdit 
-          ? <>
-            <Button text="Save"/>
+    <div className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
+      {isEdit ? <>
+        <form className={s.editForm}>
+          <div className={s.editTodo}>
+            <input 
+              type="checkbox" 
+              className={s.checkbox} 
+              checked={checked} 
+              onChange={() => handleToggle()}
+            />
+            <Input 
+              name="title"
+              value={title}
+            />
+          </div>
+          <div className={s.buttons}>
+            <Button
+              type='submit' 
+              text="Save"
+            />
             <Button 
               text="Cancel"
               onClick={() => { setIsEdit(false)}}
-              />
-            </>
-          : <>
-              <Button 
-                type='button'
-                text='Edit'
-                onClick={() => {setIsEdit(true)}}
-              />
-              <Button 
-                type='button'
-                text='Delete'
-                onClick={() => handleDelete(id)}
-              />
-            </>
-        }
-      </div>
+            />
+          </div>
+        </form>
+        </> 
+        : <>
+          <div className={s.todo}>
+            <input 
+              type="checkbox" 
+              className={s.checkbox} 
+              checked={checked} 
+              onChange={() => handleToggle()}
+            />
+            <div className={`${s.title} ${checked ? s.titleIsDone : ''}`}>{title}</div>
+          </div>
+          <div className={s.buttons}>
+            <Button 
+              type='button'
+              text='Edit'
+              onClick={() => {setIsEdit(true)}}
+            />
+            <Button 
+              type='button'
+              text='Delete'
+              onClick={() => handleDelete(id)}
+            />
+          </div>
+        </>}
     </div>
   )
 }

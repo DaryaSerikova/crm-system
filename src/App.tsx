@@ -9,7 +9,7 @@ import s from './App.module.scss';
 
 
 function App() {
-  const [name, setName] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
   const [todos, setTodos] = useState(null);
 
@@ -61,7 +61,7 @@ function App() {
       }
       createTodo(todo);
       // formElement.reset();
-      setName('');
+      setTitle('');
     }
     else console.log('it is not valid value')
   }
@@ -77,7 +77,7 @@ function App() {
           <Input 
             error={error}
             name='title'
-            value={name}
+            value={title}
             onChange={(e) => {setName(e.target.value)}} 
           />
           <Button text="Add" type="submit"/>
