@@ -14,20 +14,23 @@ export interface IFullTodo {
 const Todo = (props: IFullTodo) => {
   const { id, title, isDone } = props;
   const [ checked, setChecked] = useState<boolean>(false);
+  const [ isEdit, setIsEdit] = useState<boolean>(false);
 
   useEffect(() => {
     setChecked(isDone);
+    console.log('useEffect,[]')
   }, []);
-
-  useEffect(() => {
-    //to server
-    // editTodo(id, {title: title, isDone: checked});
-  }, [checked]);
 
   const handleDelete = (id) => {
     deleteTodo(id);
     //перезагрузить список отображения 
   }
+  const handleToggle = () => {
+    editTodo(id, {title: title, isDone: !checked});
+    setChecked(!checked);
+  }
+
+  console.log('isEdit ', isEdit)
 
 
   return (
@@ -37,21 +40,32 @@ const Todo = (props: IFullTodo) => {
           type="checkbox" 
           className={s.checkbox} 
           checked={checked} 
-          onChange={() => setChecked(!checked)}
+          onChange={() => handleToggle()}
         />
         <div className={`${s.title} ${checked ? s.titleIsDone : ''}`}>{title}</div>
       </div>
       <div className={s.buttons}>
-        <Button 
-          type='button'
-          text='Edit'
-        />
-        <Button 
-          type='button'
-          text='Delete'
-          onClick={() => handleDelete(id)}
-
-        />
+        {isEdit 
+          ? <>
+            <Button text="Save"/>
+            <Button 
+              text="Cancel"
+              onClick={() => { setIsEdit(false)}}
+              />
+            </>
+          : <>
+              <Button 
+                type='button'
+                text='Edit'
+                onClick={() => {setIsEdit(true)}}
+              />
+              <Button 
+                type='button'
+                text='Delete'
+                onClick={() => handleDelete(id)}
+              />
+            </>
+        }
       </div>
     </div>
   )
