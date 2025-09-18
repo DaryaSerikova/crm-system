@@ -16,9 +16,11 @@ const Todo = (props: IFullTodo) => {
   const { id, title, isDone, todos, setTodos } = props;
   const [ checked, setChecked] = useState<boolean>(false);
   const [ isEdit, setIsEdit] = useState<boolean>(false);
+  const [editTitle, setEditTitle] = useState<string|null>(null);
 
   useEffect(() => {
     setChecked(isDone);
+    setEditTitle(title);
     console.log('useEffect,[]')
   }, []);
 
@@ -36,13 +38,27 @@ const Todo = (props: IFullTodo) => {
     setChecked(!checked);
   }
 
-  // console.log('isEdit ', isEdit)
+  const handleEdit = (e) => {
+    setEditTitle(e.target.value);
+  }
 
+  const handleEditForm = async (e) => {
+    e.preventDefault();
+    const objData = await editTodo(id, {isDone: checked, title: editTitle});
+    console.log('objData: ', objData);
+    if (objData.status === 200) {
+      const index = todos.findIndex((item) => item.id === id);
+      const newTodos = [...todos.slice(0, index), objData?.editedTodo,...todos.slice(index+1)];
+      console.log('index: ', index)
+      setTodos(newTodos);
+      setIsEdit(false);
+    }
+  }
 
   return (
     <div className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
       {isEdit ? <>
-        <form className={s.editForm}>
+        <form className={s.editForm} onSubmit={handleEditForm}>
           <div className={s.editTodo}>
             <input 
               type="checkbox" 
@@ -52,7 +68,9 @@ const Todo = (props: IFullTodo) => {
             />
             <Input 
               name="title"
-              value={title}
+              value={editTitle}
+              onChange={handleEdit}
+
             />
           </div>
           <div className={s.buttons}>

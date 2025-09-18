@@ -54,7 +54,7 @@ export const editTodo = async (id, todo) => {
       },
     });
     const data = await response.json();
-    console.log('data: ', data);
+    return {editedTodo: data, status: response.status};
 
   } catch (err) {
     console.error('editTodo, ERROR, ', err);
