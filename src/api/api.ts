@@ -34,6 +34,7 @@ export const createTodo = async (todo: ITodo) => {
       }
 
     });
+
     const newTodo = await response.json();
     // console.log(newTodo);
     return newTodo;
@@ -68,6 +69,8 @@ export const deleteTodo = async (id) => {
         'Content-Type': 'application/json',
       },   
     })
+    // console.log(response.status)
+    return response;
 
   } catch (err) {
     console.error('deleteTodo ERROR: ', err)

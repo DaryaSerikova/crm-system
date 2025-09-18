@@ -13,7 +13,7 @@ export interface IFullTodo {
 }
 
 const Todo = (props: IFullTodo) => {
-  const { id, title, isDone } = props;
+  const { id, title, isDone, todos, setTodos } = props;
   const [ checked, setChecked] = useState<boolean>(false);
   const [ isEdit, setIsEdit] = useState<boolean>(false);
 
@@ -22,16 +22,21 @@ const Todo = (props: IFullTodo) => {
     console.log('useEffect,[]')
   }, []);
 
-  const handleDelete = (id) => {
-    deleteTodo(id);
-    //перезагрузить список отображения 
+  const handleDelete = async(id) => {
+    const response = await deleteTodo(id);
+    console.log('response?.status', response?.status)
+
+    if (response?.status === 200) {
+      const newTodos = todos.filter((item) => (item.id !== id));
+      setTodos(newTodos);
+    }
   }
   const handleToggle = () => {
     editTodo(id, {title: title, isDone: !checked});
     setChecked(!checked);
   }
 
-  console.log('isEdit ', isEdit)
+  // console.log('isEdit ', isEdit)
 
 
   return (

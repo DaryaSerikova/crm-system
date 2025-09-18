@@ -16,6 +16,9 @@
   align-items: center;
 
   .card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     width: 700px;
     height: min-content;
     background-color: #f3f3f3;

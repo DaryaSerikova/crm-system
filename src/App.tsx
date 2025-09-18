@@ -22,22 +22,36 @@ function App() {
 
   console.log('todos: ', todos);
 
-  const getValidation = (str: string) => {
-
-    if (str.length === 0) {
-      setError("Поле не может быть пустым!");
-      return false;
-    }
+  const getValidation2 = (str: string) => {
+    if (str.length === 0) return {isValid: false, message: "Поле не может быть пустым!"};
     else {
       const regexp = new RegExp("^.{2,64}$", "g");
       const result = regexp.test(str);
       if (!result) {
-        if (str.length < 2 ) setError("Cимволов не может быть менее 2");
-        if (str.length > 64 ) setError("Cимволов не может быть более 64");
+        if (str.length < 2 ) return {isValid: false, message: "Cимволов не может быть менее 2"}
+        if (str.length > 64 ) return {isValid: false, message: "Cимволов не может быть более 64"}
       }
-      return result;
     }
+    return {isValid: true, message: null};
+
   }
+
+  // const getValidation = (str: string) => {
+
+  //   if (str.length === 0) {
+  //     setError("Поле не может быть пустым!");
+  //     return false;
+  //   }
+  //   else {
+  //     const regexp = new RegExp("^.{2,64}$", "g");
+  //     const result = regexp.test(str);
+  //     if (!result) {
+  //       if (str.length < 2 ) setError("Cимволов не может быть менее 2");
+  //       if (str.length > 64 ) setError("Cимволов не может быть более 64");
+  //     }
+  //     return result;
+  //   }
+  // }
 
   const handleForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,24 +60,37 @@ function App() {
 
     const formData = new FormData(formElement); 
     const titleValue = formData.get('title')?.toString().trim() || '';
-    const isValid = getValidation(titleValue);
+    const validation = getValidation2(titleValue);
+
+    // const isValid = getValidation(titleValue);
+    // const isValid = validation.isValid;
+
 
     // console.log('titleValue: ', titleValue);
     // console.log('isValid: ', isValid)
 
 
-    if (isValid) {
+    if (validation.isValid) {
       setError(null);
 
       const todo = {
         isDone: false,
         title: titleValue
       }
-      createTodo(todo);
+      const response = createTodo(todo);
+      response.then((newTodo) => {
+        const newTodos = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
+        
+        console.log('newTodo: ', newTodo);
+        console.log('newTodos: ', newTodos);
+
+        setTodos(newTodos);
+      });
+
       // formElement.reset();
       setTitle('');
     }
-    else console.log('it is not valid value')
+    else setError(validation.message);
   }
 
   return (
@@ -78,12 +105,14 @@ function App() {
             error={error}
             name='title'
             value={title}
-            onChange={(e) => {setName(e.target.value)}} 
+            onChange={(e) => {setTitle(e.target.value)}} 
           />
           <Button text="Add" type="submit"/>
         </form>
 
-        { todos ? <TodoList todos={todos}/> : <></>}
+        { todos 
+        ? <TodoList todos={todos} setTodos={setTodos}/> 
+        : <></>}
         {/* <Todo isDone={false} title='dnjkfhndkjf'/> */}
       </div>
     </div>

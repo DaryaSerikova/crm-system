@@ -3,7 +3,7 @@ import Todo, { type IFullTodo } from '../todo/todo';
 
 
 
-const TodoList = ({ todos }: IFullTodo[]) => {
+const TodoList = ({ todos, setTodos }: IFullTodo[]) => {
   return (
     <div className={s.todoList}>
       {todos?.map((item: IFullTodo) => 
@@ -12,6 +12,8 @@ const TodoList = ({ todos }: IFullTodo[]) => {
           isDone={item.isDone}
           title={item.title}
           created={item.created}
+          todos={todos}
+          setTodos={setTodos}
         />
       )}
     </div>
