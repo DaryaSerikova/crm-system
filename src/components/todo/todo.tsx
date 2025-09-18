@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Button from '../button/button';
 import s from './todo.module.scss';
-import { editTodo } from '../../api/api';
+import { deleteTodo, editTodo } from '../../api/api';
 
 
 export interface IFullTodo {
@@ -17,12 +17,18 @@ const Todo = (props: IFullTodo) => {
 
   useEffect(() => {
     setChecked(isDone);
-  },[]);
+  }, []);
 
   useEffect(() => {
     //to server
-    editTodo(id, {title: title, isDone: checked});
+    // editTodo(id, {title: title, isDone: checked});
   }, [checked]);
+
+  const handleDelete = (id) => {
+    deleteTodo(id);
+    //перезагрузить список отображения 
+  }
+
 
   return (
     <div className={s.wrapperTodo}>
@@ -43,6 +49,8 @@ const Todo = (props: IFullTodo) => {
         <Button 
           type='button'
           text='Delete'
+          onClick={() => handleDelete(id)}
+
         />
       </div>
     </div>

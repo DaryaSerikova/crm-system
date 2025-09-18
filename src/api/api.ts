@@ -48,14 +48,28 @@ export const editTodo = async (id, todo) => {
     const response = await fetch(`${baseUrl}/todos/${id}`, {
       method: 'PUT',
       body: JSON.stringify(todo),
-      headers : {
+      headers: {
         'Content-Type' : 'application/json',
       },
     });
     const data = await response.json();
     console.log('data: ', data);
-    
+
   } catch (err) {
     console.error('editTodo, ERROR, ', err);
+  }
+}
+
+export const deleteTodo = async (id) => {
+  try {
+    const response = await fetch(`${baseUrl}/todos/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },   
+    })
+
+  } catch (err) {
+    console.error('deleteTodo ERROR: ', err)
   }
 }
