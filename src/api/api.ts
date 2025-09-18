@@ -42,3 +42,20 @@ export const createTodo = async (todo: ITodo) => {
     console.error('Error (createTodo), err: ', err);
   }
 }
+
+export const editTodo = async (id, todo) => {
+  try {
+    const response = await fetch(`${baseUrl}/todos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(todo),
+      headers : {
+        'Content-Type' : 'application/json',
+      },
+    });
+    const data = await response.json();
+    console.log('data: ', data);
+    
+  } catch (err) {
+    console.error('editTodo, ERROR, ', err);
+  }
+}
