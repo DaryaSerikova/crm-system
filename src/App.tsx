@@ -5,22 +5,38 @@ import Todo from './components/todo/todo';
 import Button from './components/button/button'
 import Input from './components/input/input'
 import s from './App.module.scss';
+import Filters from './components/filters/Filters';
 
+type TFilter = "all" | "completed" | "inWork";
 
 
 function App() {
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
   const [todos, setTodos] = useState(null);
+  const [filter, setFilter] = useState<TFilter>("all");
 
   useEffect(() => {
-    getAllTodos().then(allTodos => {
-      setTodos(allTodos.data);
-    });
+    console.log('todos === null ', todos === null)
+    if (todos === null) {
+      getAllTodos(filter).then(allTodos => {
+        console.log('App, allTodos useEff[]: ', allTodos)
+        setTodos(allTodos.data);
+      });
+    }
   }, []);
 
+  useEffect(() => {
+    if (todos !== null) {
+      getAllTodos(filter).then(allTodos => {
+        console.log('App, allTodos useEff[filter]: ', allTodos)
+        setTodos(allTodos.data);
+      });
+    }
+  }, [filter]);
 
-  console.log('todos: ', todos);
+
+  console.log('App todos: ', todos);
 
   const getValidation2 = (str: string) => {
     if (str.length === 0) return {isValid: false, message: "Поле не может быть пустым!"};
@@ -36,23 +52,6 @@ function App() {
 
   }
 
-  // const getValidation = (str: string) => {
-
-  //   if (str.length === 0) {
-  //     setError("Поле не может быть пустым!");
-  //     return false;
-  //   }
-  //   else {
-  //     const regexp = new RegExp("^.{2,64}$", "g");
-  //     const result = regexp.test(str);
-  //     if (!result) {
-  //       if (str.length < 2 ) setError("Cимволов не может быть менее 2");
-  //       if (str.length > 64 ) setError("Cимволов не может быть более 64");
-  //     }
-  //     return result;
-  //   }
-  // }
-
   const handleForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -61,14 +60,6 @@ function App() {
     const formData = new FormData(formElement); 
     const titleValue = formData.get('title')?.toString().trim() || '';
     const validation = getValidation2(titleValue);
-
-    // const isValid = getValidation(titleValue);
-    // const isValid = validation.isValid;
-
-
-    // console.log('titleValue: ', titleValue);
-    // console.log('isValid: ', isValid)
-
 
     if (validation.isValid) {
       setError(null);
@@ -81,8 +72,8 @@ function App() {
       response.then((newTodo) => {
         const newTodos = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
         
-        console.log('newTodo: ', newTodo);
-        console.log('newTodos: ', newTodos);
+        // console.log('newTodo: ', newTodo);
+        // console.log('newTodos: ', newTodos);
 
         setTodos(newTodos);
       });
@@ -109,9 +100,9 @@ function App() {
           />
           <Button text="Add" type="submit"/>
         </form>
-
+        <Filters filter={filter} setFilter={setFilter}/>
         { todos 
-        ? <TodoList todos={todos} setTodos={setTodos}/> 
+        ? <TodoList todos={todos} setTodos={setTodos} filters={filter}/> 
         : <></>}
         {/* <Todo isDone={false} title='dnjkfhndkjf'/> */}
       </div>

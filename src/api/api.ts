@@ -12,10 +12,20 @@ interface ITodo {
 //   title: string
 // }
 
-export const getAllTodos = async () => {
+export const getAllTodos = async (filter) => {
+  // export const getAllTodos = async () => {
+
+  const searchParams = new URLSearchParams({
+    'filter': `${filter}`,
+    // 'sub-category': 'fiction',
+  });
+
   try {
-    const response = await fetch(`${baseUrl}/todos`);
+    const response = await fetch(`${baseUrl}/todos?${searchParams.toString()}`);
+    // const response = await fetch(`${baseUrl}/todos`);
     const data = await response.json();
+    console.log('response (getAllTodos): ', response)
+    console.log('data (getAllTodos): ', data);
     return data;
   } catch (err) {
     console.error('Error (getTodos), err: ', err);
@@ -61,7 +71,7 @@ export const editTodo = async (id, todo) => {
   }
 }
 
-export const deleteTodo = async (id) => {
+export const deleteTodo = async (id: number) => {
   try {
     const response = await fetch(`${baseUrl}/todos/${id}`, {
       method: 'DELETE',

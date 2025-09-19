@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import Button from '../button/button';
 import s from './todo.module.scss';
 import { deleteTodo, editTodo } from '../../api/api';
@@ -12,28 +12,46 @@ export interface IFullTodo {
   title: string,
 }
 
+// const Todo = memo((props: IFullTodo) => {
 const Todo = (props: IFullTodo) => {
-  const { id, title, isDone, todos, setTodos } = props;
-  const [ checked, setChecked] = useState<boolean>(false);
+
+  // console.log('todo props: ', props)
+  const { id, title, isDone, todos, setTodos, filters } = props;
+  const [ checked, setChecked] = useState<boolean | null>(null);
   const [ isEdit, setIsEdit] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState<string|null>(null);
 
   useEffect(() => {
-    setChecked(isDone);
+    if (checked === null) setChecked(isDone);
+    // setChecked(isDone);
     setEditTitle(title);
-    console.log('useEffect,[]')
+    console.log('Todo, useEffect,[]')
   }, []);
+
+  useEffect(() => {
+    setChecked(isDone);
+  }, [isDone])
+
+  useEffect(() => {
+    console.log(title, ', checked изменился: ', checked)
+  }, [checked])
 
   const handleDelete = async(id) => {
     const response = await deleteTodo(id);
-    console.log('response?.status', response?.status)
+    // console.log('response?.status', response?.status)
 
     if (response?.status === 200) {
       const newTodos = todos.filter((item) => (item.id !== id));
       setTodos(newTodos);
     }
   }
-  const handleToggle = () => {
+  
+  const handleToggle = (e) => {
+    console.log('handleToggle, checked:', checked)
+    console.log('e.target.checked, handleToggle: ', e.target.checked)
+    // editTodo(id, {title: title, isDone: e.target.checked});
+    // setChecked(e.target.checked);
+
     editTodo(id, {title: title, isDone: !checked});
     setChecked(!checked);
   }
@@ -45,15 +63,16 @@ const Todo = (props: IFullTodo) => {
   const handleEditForm = async (e) => {
     e.preventDefault();
     const objData = await editTodo(id, {isDone: checked, title: editTitle});
-    console.log('objData: ', objData);
+    // console.log('objData: ', objData);
     if (objData.status === 200) {
       const index = todos.findIndex((item) => item.id === id);
       const newTodos = [...todos.slice(0, index), objData?.editedTodo,...todos.slice(index+1)];
-      console.log('index: ', index)
+      // console.log('index: ', index)
       setTodos(newTodos);
       setIsEdit(false);
     }
   }
+  console.log(title, ', checked: ', checked)
 
   return (
     <div className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
@@ -91,7 +110,9 @@ const Todo = (props: IFullTodo) => {
               type="checkbox" 
               className={s.checkbox} 
               checked={checked} 
-              onChange={() => handleToggle()}
+              // checked={isDone} 
+
+              onChange={(e) => handleToggle(e)}
             />
             <div className={`${s.title} ${checked ? s.titleIsDone : ''}`}>{title}</div>
           </div>
@@ -111,5 +132,7 @@ const Todo = (props: IFullTodo) => {
     </div>
   )
 }
+// })
+
 
 export default Todo;
