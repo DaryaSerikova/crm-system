@@ -1,44 +1,63 @@
-import { useEffect, useState, memo } from 'react';
-import Button from '../button/button';
-import s from './todo.module.scss';
+import { useEffect, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { deleteTodo, editTodo } from '../../api/api';
+import Button from '../button/button';
 import Input from '../input/input';
+import s from './todo.module.scss';
+import { getValidation } from '../../utils/utils';
+import type { TFilter } from '../../App';
 
 
 export interface IFullTodo {
   created: string,
   id: number,
-  isDone: true,
+  isDone: boolean,
   title: string,
 }
 
-// const Todo = memo((props: IFullTodo) => {
-const Todo = (props: IFullTodo) => {
+interface ITodoProps {
+  created: string,
+  id: number,
+  isDone: boolean,
+  title: string,
+  todos: IFullTodo[],
+  setTodos: Dispatch<SetStateAction<IFullTodo[] | null>>
+  listFilter: TFilter,
+}
 
-  // console.log('todo props: ', props)
-  const { id, title, isDone, todos, setTodos, filters } = props;
+const Todo = (props: ITodoProps) => {
+
+  const { id, title, isDone, todos, setTodos, listFilter } = props;
   const [ checked, setChecked] = useState<boolean | null>(null);
   const [ isEdit, setIsEdit] = useState<boolean>(false);
-  const [editTitle, setEditTitle] = useState<string|null>(null);
+  const [editTitle, setEditTitle] = useState<string>(''); //null проверить как работает !!!!!
+  const [ editError, setEditError ] = useState<string | null>(null);
 
   useEffect(() => {
     if (checked === null) setChecked(isDone);
-    // setChecked(isDone);
     setEditTitle(title);
     console.log('Todo, useEffect,[]')
   }, []);
 
   useEffect(() => {
     setChecked(isDone);
-  }, [isDone])
+  }, [isDone, todos]);
 
   useEffect(() => {
-    console.log(title, ', checked изменился: ', checked)
-  }, [checked])
+    setEditTitle(title);
+  }, [title]);
 
-  const handleDelete = async(id) => {
+  useEffect(() => {
+    if(isEdit === true) {
+      setEditTitle(title);
+      setEditError(null);
+      setIsEdit(false);
+    }
+  }, [listFilter])
+
+
+  const handleDelete = async(id: number) => {
     const response = await deleteTodo(id);
-    // console.log('response?.status', response?.status)
 
     if (response?.status === 200) {
       const newTodos = todos.filter((item) => (item.id !== id));
@@ -46,33 +65,58 @@ const Todo = (props: IFullTodo) => {
     }
   }
   
-  const handleToggle = (e) => {
-    console.log('handleToggle, checked:', checked)
-    console.log('e.target.checked, handleToggle: ', e.target.checked)
-    // editTodo(id, {title: title, isDone: e.target.checked});
-    // setChecked(e.target.checked);
-
-    editTodo(id, {title: title, isDone: !checked});
+  const handleToggle = async () => {
+    // console.log('handleToggle, checked:', checked)
+    const response = await editTodo(id, {title: title, isDone: !checked})
     setChecked(!checked);
+    // response.json();
+    console.log('!!!!!!!!!!!!!!!!! response.status', response?.status);
+
+    if (listFilter ==='inWork' || listFilter === 'completed') {
+      if (response?.status === 200) {
+        //удалить ненужный эл
+        const newTodos = todos.filter((item) => (item.id !== id));
+        setTodos(newTodos);
+      }
+    }
+
   }
 
-  const handleEdit = (e) => {
+  const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {///??????ts
     setEditTitle(e.target.value);
   }
 
-  const handleEditForm = async (e) => {
+  const handleEditForm = async (e: React.FormEvent<HTMLFormElement>) => { 
     e.preventDefault();
-    const objData = await editTodo(id, {isDone: checked, title: editTitle});
-    // console.log('objData: ', objData);
-    if (objData.status === 200) {
-      const index = todos.findIndex((item) => item.id === id);
-      const newTodos = [...todos.slice(0, index), objData?.editedTodo,...todos.slice(index+1)];
-      // console.log('index: ', index)
-      setTodos(newTodos);
-      setIsEdit(false);
-    }
+
+    const validation = getValidation(editTitle);
+
+    if (validation.isValid) {
+        setEditError(null);
+
+      const objData = await editTodo(id, {isDone: checked, title: editTitle});
+  
+      if (objData?.status === 200) {
+        const index = todos.findIndex((item: IFullTodo) => item.id === id);
+        const newTodos = [
+          ...todos.slice(0, index), 
+          objData?.editedTodo,
+          ...todos.slice(index+1)];
+  
+        setTodos(newTodos);
+        setIsEdit(false);
+      }
+    } else setEditError(validation.message)
+
   }
-  console.log(title, ', checked: ', checked)
+
+  const handleCancel = () => {
+    setEditTitle(title);
+    setEditError(null);
+    setIsEdit(false);
+  }
+
+  // console.log(title, ', checked: ', checked)
 
   return (
     <div className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
@@ -89,7 +133,7 @@ const Todo = (props: IFullTodo) => {
               name="title"
               value={editTitle}
               onChange={handleEdit}
-
+              error={editError}
             />
           </div>
           <div className={s.buttons}>
@@ -99,7 +143,7 @@ const Todo = (props: IFullTodo) => {
             />
             <Button 
               text="Cancel"
-              onClick={() => { setIsEdit(false)}}
+              onClick={() => handleCancel()}
             />
           </div>
         </form>
@@ -110,9 +154,7 @@ const Todo = (props: IFullTodo) => {
               type="checkbox" 
               className={s.checkbox} 
               checked={checked} 
-              // checked={isDone} 
-
-              onChange={(e) => handleToggle(e)}
+              onChange={() => handleToggle()}
             />
             <div className={`${s.title} ${checked ? s.titleIsDone : ''}`}>{title}</div>
           </div>
@@ -132,7 +174,6 @@ const Todo = (props: IFullTodo) => {
     </div>
   )
 }
-// })
 
 
 export default Todo;

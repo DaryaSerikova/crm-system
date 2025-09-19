@@ -1,25 +1,27 @@
 import { useState, useEffect} from 'react';
 import { createTodo, getAllTodos } from './api/api';
 import TodoList from './components/todo-list/todo-list';
-import Todo from './components/todo/todo';
 import Button from './components/button/button'
 import Input from './components/input/input'
 import s from './App.module.scss';
-import Filters from './components/filters/Filters';
+import Filters from './components/filters/filters';
+import type { IFullTodo } from './components/todo/todo';
+import { getValidation } from './utils/utils';
 
-type TFilter = "all" | "completed" | "inWork";
+
+export type TFilter = "all" | "completed" | "inWork";
 
 
 function App() {
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
-  const [todos, setTodos] = useState(null);
-  const [filter, setFilter] = useState<TFilter>("all");
+  const [todos, setTodos] = useState<IFullTodo[] | null>(null);
+  const [listFilter, setListFilter] = useState<TFilter>("all");
 
   useEffect(() => {
     console.log('todos === null ', todos === null)
     if (todos === null) {
-      getAllTodos(filter).then(allTodos => {
+      getAllTodos(listFilter).then(allTodos => {
         console.log('App, allTodos useEff[]: ', allTodos)
         setTodos(allTodos.data);
       });
@@ -28,29 +30,16 @@ function App() {
 
   useEffect(() => {
     if (todos !== null) {
-      getAllTodos(filter).then(allTodos => {
-        console.log('App, allTodos useEff[filter]: ', allTodos)
+      getAllTodos(listFilter).then(allTodos => {
+        console.log('App, allTodos useEff[listFilter]: ', allTodos)
         setTodos(allTodos.data);
       });
     }
-  }, [filter]);
+  }, [listFilter]);
 
 
   console.log('App todos: ', todos);
 
-  const getValidation2 = (str: string) => {
-    if (str.length === 0) return {isValid: false, message: "Поле не может быть пустым!"};
-    else {
-      const regexp = new RegExp("^.{2,64}$", "g");
-      const result = regexp.test(str);
-      if (!result) {
-        if (str.length < 2 ) return {isValid: false, message: "Cимволов не может быть менее 2"}
-        if (str.length > 64 ) return {isValid: false, message: "Cимволов не может быть более 64"}
-      }
-    }
-    return {isValid: true, message: null};
-
-  }
 
   const handleForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,7 +48,7 @@ function App() {
 
     const formData = new FormData(formElement); 
     const titleValue = formData.get('title')?.toString().trim() || '';
-    const validation = getValidation2(titleValue);
+    const validation = getValidation(titleValue);
 
     if (validation.isValid) {
       setError(null);
@@ -68,13 +57,10 @@ function App() {
         isDone: false,
         title: titleValue
       }
+
       const response = createTodo(todo);
       response.then((newTodo) => {
-        const newTodos = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
-        
-        // console.log('newTodo: ', newTodo);
-        // console.log('newTodos: ', newTodos);
-
+        const newTodos: IFullTodo[] = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
         setTodos(newTodos);
       });
 
@@ -100,9 +86,9 @@ function App() {
           />
           <Button text="Add" type="submit"/>
         </form>
-        <Filters filter={filter} setFilter={setFilter}/>
+        <Filters setListFilter={setListFilter}/>
         { todos 
-        ? <TodoList todos={todos} setTodos={setTodos} filters={filter}/> 
+        ? <TodoList todos={todos} setTodos={setTodos} listFilter={listFilter}/> 
         : <></>}
         {/* <Todo isDone={false} title='dnjkfhndkjf'/> */}
       </div>

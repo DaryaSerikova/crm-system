@@ -1,11 +1,15 @@
 import s from './todo-list.module.scss';
 import Todo, { type IFullTodo } from '../todo/todo';
-import { memo } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import type { TFilter } from '../../App';
 
+interface ITodoListProps {
+  todos: IFullTodo[],
+  setTodos: Dispatch<SetStateAction<IFullTodo[] | null>>
+  listFilter: TFilter,
+}
 
-
-// const TodoList = memo(({ todos, setTodos }: IFullTodo[]) => {
-const TodoList = ({ todos, setTodos, filters }: IFullTodo[]) => {
+const TodoList = ({ todos, setTodos, listFilter }: ITodoListProps) => {
 
   console.log('TodoList, todos: ', todos)
   return (
@@ -19,13 +23,12 @@ const TodoList = ({ todos, setTodos, filters }: IFullTodo[]) => {
           created={item.created}
           todos={todos}
           setTodos={setTodos}
-          filters={filters}
+          listFilter={listFilter}
         />
       }
       )}
     </div>
   )
-// });
 };
 
 

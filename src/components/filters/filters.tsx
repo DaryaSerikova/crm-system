@@ -1,30 +1,41 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { type TFilter } from '../../App';
 import s from './filters.module.scss';
 
-type Props = {}
+
+
+interface IFiltersProps {
+  setListFilter: Dispatch<SetStateAction<TFilter>>,
+}
 
 interface IFilters {
   id: number,
   value: string,
   label: string,
-  // isActive: boolean,
 }
 
-const Filters = ({ setFilter }: Props) => {
+type TFilterIds = 1 | 2 | 3;
 
-  // const [filters, setFilters] = useState()
-  // all, completed, or inWork
+///количество задач
+//покинуть список если tiggle
+
+const Filters = ({ setListFilter }: IFiltersProps) => {
+  const [currentFilterId, setCurrentFilterId] = useState<TFilterIds>(1)
+
   const filtersArray: IFilters[] = [
     {id: 1, value: 'all', label: 'Все'},
-    {id: 2, value: 'inWork', label: 'в работе'},
-    {id: 3, value: 'completed', label: 'сделано'},
+    {id: 2, value: 'inWork', label: 'В прогрессе'},
+    {id: 3, value: 'completed', label: 'Завершенные'},
   ];
-  const filtersValues = {1: 'all', 2:'inWork', 3:'completed'}
+  const filtersValues = {1: 'all', 2:'inWork', 3:'completed'};
+  // const filtersKeys = {'all': 1, 'inWork': 2, 'completed': 3};
 
   const handleClick = (e) => {
     const id = e.target.id;
-    const filter = filtersValues[`${id}`];
-    setFilter(filter);
+    const filter: TFilter = filtersValues[`${id}`];
+    setListFilter(filter);
+    setCurrentFilterId(id);
     console.log('e.target.id: ', e.target.id);
     console.log('filter todo: ', filter);
     //jтправить запрос с фильтром
@@ -38,9 +49,9 @@ const Filters = ({ setFilter }: Props) => {
     <div className={s.filters}>
       {filtersArray.map((item) => 
         <div 
-          className={s.tab} 
+          className={`${s.tab} ${+currentFilterId === +item.id ? s.isActive : ''}`} 
           key={item.id}
-          id={item.id}
+          id={+item.id}
           value={item.value}
           onClick={handleClick}
         >

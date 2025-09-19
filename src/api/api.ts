@@ -1,3 +1,5 @@
+import type { TFilter } from "../App";
+
 const baseUrl = 'https://easydev.club/api/v1';
 
 interface ITodo {
@@ -12,12 +14,10 @@ interface ITodo {
 //   title: string
 // }
 
-export const getAllTodos = async (filter) => {
-  // export const getAllTodos = async () => {
+export const getAllTodos = async (filter: TFilter) => {
 
   const searchParams = new URLSearchParams({
     'filter': `${filter}`,
-    // 'sub-category': 'fiction',
   });
 
   try {
@@ -34,19 +34,15 @@ export const getAllTodos = async (filter) => {
 
 export const createTodo = async (todo: ITodo) => {
   try {
-    // console.log('todo: ', todo)
-
     const response = await fetch(`${baseUrl}/todos`, {
       method: 'POST',
       body: JSON.stringify(todo),
       headers: {
         'Content-Type': 'application/json'
       }
-
     });
 
     const newTodo = await response.json();
-    // console.log(newTodo);
     return newTodo;
 
   } catch (err) {
@@ -54,7 +50,7 @@ export const createTodo = async (todo: ITodo) => {
   }
 }
 
-export const editTodo = async (id, todo) => {
+export const editTodo = async (id: number, todo: ITodo) => {
   try {
     const response = await fetch(`${baseUrl}/todos/${id}`, {
       method: 'PUT',
