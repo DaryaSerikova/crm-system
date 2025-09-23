@@ -1,7 +1,9 @@
-import s from './todo-list.module.scss';
-import Todo, { type IFullTodo } from '../todo/todo';
 import type { Dispatch, SetStateAction } from 'react';
 import type { TFilter, TListsInfo } from '../../App';
+import Todo, { type IFullTodo } from '../todo/todo';
+import s from './todo-list.module.scss';
+
+
 
 interface ITodoListProps {
   todos: IFullTodo[],
@@ -28,8 +30,7 @@ const TodoList = ({ todos, setTodos, listFilter, setListsInfo, listsInfo }: ITod
           setListsInfo={setListsInfo}
           listsInfo={listsInfo}
         />
-      }
-      )}
+      })}
     </div>
   )
 };

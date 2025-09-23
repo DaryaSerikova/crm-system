@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { deleteTodo, editTodo } from '../../api/api';
+import type { TFilter, TListsInfo } from '../../App';
 import Button from '../button/button';
 import Input from '../input/input';
-import s from './todo.module.scss';
 import { getValidation } from '../../utils/utils';
-import type { TFilter, TListsInfo } from '../../App';
+import s from './todo.module.scss';
 
 
 export interface IFullTodo {
@@ -39,7 +39,6 @@ const Todo = (props: ITodoProps) => {
   useEffect(() => {
     if (checked === null) setChecked(isDone);
     setEditTitle(title);
-    // console.log('Todo, useEffect,[]')
   }, []);
 
   useEffect(() => {
@@ -79,22 +78,15 @@ const Todo = (props: ITodoProps) => {
   }
   
   const handleToggle = async () => {
-    console.log('handleToggle, !checked:', !checked)
     const response = await editTodo(id, {title: title, isDone: !checked})
     setChecked(!checked);
-    // response.json();
-    console.log('!!!!!!!!!!!!!!!!! response.status', response?.status);
 
     if (response?.status === 200) {
       if (listFilter ==='inWork' || listFilter === 'completed') {
-      //удалить ненужный эл
-      const newTodos = todos.filter((item) => (item.id !== id));
-      setTodos(newTodos);
+        const newTodos = todos.filter((item) => (item.id !== id));
+        setTodos(newTodos);
       }
 
-      console.log('!!!!! listsInfo:', listsInfo);
-
-      // if (listFilter ==='all') {
       if (listsInfo) {
         setListsInfo({
           'all': listsInfo?.all, 
@@ -102,24 +94,19 @@ const Todo = (props: ITodoProps) => {
           'inWork': !checked ? listsInfo?.inWork - 1 : listsInfo?.inWork + 1,
         });
       }
-      // }
-
     }
-
   }
 
-  const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {///??????ts
+  const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditTitle(e.target.value);
   }
 
   const handleEditForm = async (e: React.FormEvent<HTMLFormElement>) => { 
     e.preventDefault();
-
     const validation = getValidation(editTitle);
 
     if (validation.isValid) {
-        setEditError(null);
-
+      setEditError(null);
       const objData = await editTodo(id, {isDone: checked, title: editTitle});
   
       if (objData?.status === 200) {
@@ -132,8 +119,7 @@ const Todo = (props: ITodoProps) => {
         setTodos(newTodos);
         setIsEdit(false);
       }
-    } else setEditError(validation.message)
-
+    } else setEditError(validation.message);
   }
 
   const handleCancel = () => {
@@ -141,8 +127,6 @@ const Todo = (props: ITodoProps) => {
     setEditError(null);
     setIsEdit(false);
   }
-
-  // console.log(title, ', checked: ', checked)
 
   return (
     <div className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>

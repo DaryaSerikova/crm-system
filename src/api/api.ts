@@ -24,8 +24,6 @@ export const getAllTodos = async (filter: TFilter) => {
     const response = await fetch(`${baseUrl}/todos?${searchParams.toString()}`);
     // const response = await fetch(`${baseUrl}/todos`);
     const data = await response.json();
-    console.log('response (getAllTodos): ', response)
-    console.log('data (getAllTodos): ', data);
     return data;
   } catch (err) {
     console.error('Error (getTodos), err: ', err);

@@ -3,16 +3,19 @@ import { createTodo, getAllTodos } from './api/api';
 import TodoList from './components/todo-list/todo-list';
 import Button from './components/button/button'
 import Input from './components/input/input'
-import s from './App.module.scss';
 import Filters from './components/filters/filters';
 import type { IFullTodo } from './components/todo/todo';
 import { getValidation } from './utils/utils';
+import s from './App.module.scss';
+
+
 
 export type TListsInfo = {
   all: number,
   completed: number,
   inWork: number,
 } | null;
+
 export type TFilter = "all" | "completed" | "inWork";
 
 
@@ -24,13 +27,10 @@ function App() {
   const [listsInfo, setListsInfo] = useState<TListsInfo>(null);
 
   useEffect(() => {
-    console.log('todos === null ', todos === null)
     if (todos === null) {
       getAllTodos(listFilter).then(allTodos => {
-        console.log('App, allTodos useEff[]: ', allTodos)
         setTodos(allTodos.data);
         setListsInfo(allTodos.info);
-        console.log('allTodos.info: ', allTodos.info)
       });
     }
   }, []);
@@ -38,7 +38,6 @@ function App() {
   useEffect(() => {
     if (todos !== null) {
       getAllTodos(listFilter).then(allTodos => {
-        console.log('App, allTodos useEff[listFilter]: ', allTodos)
         setTodos(allTodos.data);
         setListsInfo(allTodos.info);
       });
@@ -46,8 +45,6 @@ function App() {
     
   }, [listFilter]);
 
-
-  console.log('App todos: ', todos);
 
 
   const handleForm = (e: React.FormEvent<HTMLFormElement>) => {
@@ -78,10 +75,7 @@ function App() {
       // formElement.reset();
       setTitle('');
     }
-    else {
-      setError(validation.message);
-      console.log('??? titleValue.length: ', titleValue.length)
-    }
+    else setError(validation.message);
   }
 
   return (
@@ -104,16 +98,13 @@ function App() {
           setListFilter={setListFilter}
           listsInfo={listsInfo}
         />
-        { todos 
-        ? <TodoList 
+        { todos && <TodoList 
           todos={todos} 
           setTodos={setTodos} 
           listFilter={listFilter}
           setListsInfo={setListsInfo}
           listsInfo={listsInfo}
-          /> 
-        : <></>}
-        {/* <Todo isDone={false} title='dnjkfhndkjf'/> */}
+          />}
       </div>
     </div>
   )

@@ -34,8 +34,6 @@ const Filters = ({ setListFilter, listsInfo }: IFiltersProps) => {
     const filter: TFilter = filtersValues[`${id}`];
     setListFilter(filter);
     setCurrentFilterId(id);
-
-    console.log('filter todo: ', filter);
   }
 
 
