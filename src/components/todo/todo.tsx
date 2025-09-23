@@ -67,12 +67,19 @@ const Todo = (props: ITodoProps) => {
 
       if (listsInfo) {
         const all = listsInfo?.all;
-
-        setListsInfo({
-          'all': listsInfo?.all - 1,
-          'completed': listFilter === 'completed' ? newTodos.length : (all - 1) - newTodos.length,
-          'inWork': listFilter === 'inWork' ? newTodos.length : (all - 1) - newTodos.length,
-        });
+        if (listFilter === 'all') {
+          setListsInfo({
+            'all': listsInfo?.all - 1,
+            'completed': checked ? listsInfo?.completed - 1 : listsInfo?.completed,
+            'inWork': checked ? listsInfo?.inWork : listsInfo?.inWork - 1,
+          });
+        } else {
+          setListsInfo({
+            'all': listsInfo?.all - 1,
+            'completed': listFilter === 'completed' ? newTodos.length : (all - 1) - newTodos.length,
+            'inWork': listFilter === 'inWork' ? newTodos.length : (all - 1) - newTodos.length,
+          });
+        }
       }
     }
   }
