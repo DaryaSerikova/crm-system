@@ -1,61 +1,56 @@
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import { type TFilter } from '../../App';
+import type { TFilter, TListsInfo } from '../../App';
 import s from './filters.module.scss';
 
 
 
 interface IFiltersProps {
   setListFilter: Dispatch<SetStateAction<TFilter>>,
+  listsInfo: TListsInfo,
 }
+type TFiltersValues = {1: 'all', 2:'inWork', 3:'completed'};
+type TFilterIds = 1 | 2 | 3;
 
 interface IFilters {
-  id: number,
-  value: string,
+  id: TFilterIds,
+  value: TFilter,
   label: string,
 }
 
-type TFilterIds = 1 | 2 | 3;
 
-///количество задач
-//покинуть список если tiggle
-
-const Filters = ({ setListFilter }: IFiltersProps) => {
-  const [currentFilterId, setCurrentFilterId] = useState<TFilterIds>(1)
+const Filters = ({ setListFilter, listsInfo }: IFiltersProps) => {
+  const [currentFilterId, setCurrentFilterId] = useState<TFilterIds>(1);
 
   const filtersArray: IFilters[] = [
     {id: 1, value: 'all', label: 'Все'},
     {id: 2, value: 'inWork', label: 'В прогрессе'},
     {id: 3, value: 'completed', label: 'Завершенные'},
   ];
-  const filtersValues = {1: 'all', 2:'inWork', 3:'completed'};
-  // const filtersKeys = {'all': 1, 'inWork': 2, 'completed': 3};
+  const filtersValues: TFiltersValues = {1: 'all', 2:'inWork', 3:'completed'};
 
-  const handleClick = (e) => {
-    const id = e.target.id;
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const id = +e.currentTarget.id as TFilterIds;
     const filter: TFilter = filtersValues[`${id}`];
     setListFilter(filter);
     setCurrentFilterId(id);
-    console.log('e.target.id: ', e.target.id);
-    console.log('filter todo: ', filter);
-    //jтправить запрос с фильтром
-    //setTodos(filteredTodos)
 
-    // поменять isActive
+    console.log('filter todo: ', filter);
   }
 
 
   return (
     <div className={s.filters}>
-      {filtersArray.map((item) => 
+      {filtersArray.map((item: IFilters) => 
         <div 
-          className={`${s.tab} ${+currentFilterId === +item.id ? s.isActive : ''}`} 
+          className={`${s.tab} ${currentFilterId === item.id ? s.isActive : ''}`} 
           key={item.id}
-          id={+item.id}
-          value={item.value}
+          id={`${item.id}`} 
+          data-value={item.value}
           onClick={handleClick}
         >
-          {item.label}
+          {item.label} ({listsInfo?.[`${item.value}`]})
+          {/* количество задач не меняется в завершенных и в работе, если сделать toggle */}
         </div>
         )}
     </div>

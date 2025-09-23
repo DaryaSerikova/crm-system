@@ -8,7 +8,11 @@ import Filters from './components/filters/filters';
 import type { IFullTodo } from './components/todo/todo';
 import { getValidation } from './utils/utils';
 
-
+export type TListsInfo = {
+  all: number,
+  completed: number,
+  inWork: number,
+} | null;
 export type TFilter = "all" | "completed" | "inWork";
 
 
@@ -17,6 +21,7 @@ function App() {
   const [error, setError] = useState<string|null>(null);
   const [todos, setTodos] = useState<IFullTodo[] | null>(null);
   const [listFilter, setListFilter] = useState<TFilter>("all");
+  const [listsInfo, setListsInfo] = useState<TListsInfo>(null);
 
   useEffect(() => {
     console.log('todos === null ', todos === null)
@@ -24,6 +29,8 @@ function App() {
       getAllTodos(listFilter).then(allTodos => {
         console.log('App, allTodos useEff[]: ', allTodos)
         setTodos(allTodos.data);
+        setListsInfo(allTodos.info);
+        console.log('allTodos.info: ', allTodos.info)
       });
     }
   }, []);
@@ -33,8 +40,10 @@ function App() {
       getAllTodos(listFilter).then(allTodos => {
         console.log('App, allTodos useEff[listFilter]: ', allTodos)
         setTodos(allTodos.data);
+        setListsInfo(allTodos.info);
       });
     }
+    
   }, [listFilter]);
 
 
@@ -60,14 +69,19 @@ function App() {
 
       const response = createTodo(todo);
       response.then((newTodo) => {
-        const newTodos: IFullTodo[] = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
-        setTodos(newTodos);
+        if (todos) {
+          const newTodos: IFullTodo[] = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
+          setTodos(newTodos);
+        }
       });
 
       // formElement.reset();
       setTitle('');
     }
-    else setError(validation.message);
+    else {
+      setError(validation.message);
+      console.log('??? titleValue.length: ', titleValue.length)
+    }
   }
 
   return (
@@ -86,9 +100,18 @@ function App() {
           />
           <Button text="Add" type="submit"/>
         </form>
-        <Filters setListFilter={setListFilter}/>
+        <Filters 
+          setListFilter={setListFilter}
+          listsInfo={listsInfo}
+        />
         { todos 
-        ? <TodoList todos={todos} setTodos={setTodos} listFilter={listFilter}/> 
+        ? <TodoList 
+          todos={todos} 
+          setTodos={setTodos} 
+          listFilter={listFilter}
+          setListsInfo={setListsInfo}
+          listsInfo={listsInfo}
+          /> 
         : <></>}
         {/* <Todo isDone={false} title='dnjkfhndkjf'/> */}
       </div>

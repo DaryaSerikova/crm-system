@@ -5,7 +5,7 @@ import Button from '../button/button';
 import Input from '../input/input';
 import s from './todo.module.scss';
 import { getValidation } from '../../utils/utils';
-import type { TFilter } from '../../App';
+import type { TFilter, TListsInfo } from '../../App';
 
 
 export interface IFullTodo {
@@ -23,12 +23,15 @@ interface ITodoProps {
   todos: IFullTodo[],
   setTodos: Dispatch<SetStateAction<IFullTodo[] | null>>
   listFilter: TFilter,
+  setListsInfo: Dispatch<SetStateAction<TListsInfo>>
+  listsInfo: TListsInfo,
 }
 
 const Todo = (props: ITodoProps) => {
 
-  const { id, title, isDone, todos, setTodos, listFilter } = props;
-  const [ checked, setChecked] = useState<boolean | null>(null);
+  const { id, title, isDone, todos, setTodos, listFilter, setListsInfo, listsInfo } = props;
+
+  const [ checked, setChecked] = useState<boolean>(false); //null
   const [ isEdit, setIsEdit] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState<string>(''); //null проверить как работает !!!!!
   const [ editError, setEditError ] = useState<string | null>(null);
@@ -36,7 +39,7 @@ const Todo = (props: ITodoProps) => {
   useEffect(() => {
     if (checked === null) setChecked(isDone);
     setEditTitle(title);
-    console.log('Todo, useEffect,[]')
+    // console.log('Todo, useEffect,[]')
   }, []);
 
   useEffect(() => {
@@ -62,22 +65,45 @@ const Todo = (props: ITodoProps) => {
     if (response?.status === 200) {
       const newTodos = todos.filter((item) => (item.id !== id));
       setTodos(newTodos);
+
+      if (listsInfo) {
+        const all = listsInfo?.all;
+
+        setListsInfo({
+          'all': listsInfo?.all - 1,
+          'completed': listFilter === 'completed' ? newTodos.length : (all - 1) - newTodos.length,
+          'inWork': listFilter === 'inWork' ? newTodos.length : (all - 1) - newTodos.length,
+        });
+      }
     }
   }
   
   const handleToggle = async () => {
-    // console.log('handleToggle, checked:', checked)
+    console.log('handleToggle, !checked:', !checked)
     const response = await editTodo(id, {title: title, isDone: !checked})
     setChecked(!checked);
     // response.json();
     console.log('!!!!!!!!!!!!!!!!! response.status', response?.status);
 
-    if (listFilter ==='inWork' || listFilter === 'completed') {
-      if (response?.status === 200) {
-        //удалить ненужный эл
-        const newTodos = todos.filter((item) => (item.id !== id));
-        setTodos(newTodos);
+    if (response?.status === 200) {
+      if (listFilter ==='inWork' || listFilter === 'completed') {
+      //удалить ненужный эл
+      const newTodos = todos.filter((item) => (item.id !== id));
+      setTodos(newTodos);
       }
+
+      console.log('!!!!! listsInfo:', listsInfo);
+
+      // if (listFilter ==='all') {
+      if (listsInfo) {
+        setListsInfo({
+          'all': listsInfo?.all, 
+          'completed': !checked ? listsInfo?.completed + 1 : listsInfo?.completed - 1, 
+          'inWork': !checked ? listsInfo?.inWork - 1 : listsInfo?.inWork + 1,
+        });
+      }
+      // }
+
     }
 
   }

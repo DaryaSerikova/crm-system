@@ -75,7 +75,6 @@ export const deleteTodo = async (id: number) => {
         'Content-Type': 'application/json',
       },   
     })
-    // console.log(response.status)
     return response;
 
   } catch (err) {
