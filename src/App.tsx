@@ -65,10 +65,24 @@ function App() {
       }
 
       const response = createTodo(todo);
-      response.then((newTodo) => {
+      response.then((newTodo) => {// ts
         if (todos) {
-          const newTodos: IFullTodo[] = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
-          setTodos(newTodos);
+          if(listFilter !== 'completed') {
+            const newTodos: IFullTodo[] = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
+            setTodos(newTodos);
+          }
+
+          if (listsInfo) {
+            setListsInfo({
+              'all': listsInfo?.all + 1,
+              'completed': newTodo?.isDone ? listsInfo?.completed + 1 : listsInfo?.completed,
+              'inWork': newTodo?.isDone ? listsInfo?.inWork : listsInfo?.inWork + 1,
+            });
+          } else setListsInfo({
+            'all': 1,
+            'completed': newTodo?.isDone ? 1 : 0,
+            'inWork': newTodo?.isDone ? 0 : 1,
+          });
         }
       });
 

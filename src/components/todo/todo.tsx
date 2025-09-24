@@ -35,6 +35,7 @@ const Todo = (props: ITodoProps) => {
   const [ isEdit, setIsEdit] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState<string>(''); //null проверить как работает !!!!!
   const [ editError, setEditError ] = useState<string | null>(null);
+  // const [toggleElement, setToggleElement] = useState(null);
 
   useEffect(() => {
     if (checked === null) setChecked(isDone);
@@ -83,14 +84,28 @@ const Todo = (props: ITodoProps) => {
       }
     }
   }
-  
+
+  const getEditTodos = (id: number, todos: IFullTodo[], newElement: IFullTodo) => {
+    const index = todos.findIndex((item: IFullTodo) => item.id === id);
+    const newTodos = [
+      ...todos.slice(0, index), 
+      newElement, 
+      ...todos.slice(index+1)];
+    return newTodos;
+  }
+
   const handleToggle = async () => {
     const response = await editTodo(id, {title: title, isDone: !checked})
+    const newToggledTodo = response?.editedTodo;
     setChecked(!checked);
 
     if (response?.status === 200) {
       if (listFilter ==='inWork' || listFilter === 'completed') {
         const newTodos = todos.filter((item) => (item.id !== id));
+        setTodos(newTodos);
+      } 
+      if (listFilter ==='all') {
+        const newTodos = getEditTodos(id, todos, newToggledTodo);
         setTodos(newTodos);
       }
 
@@ -101,10 +116,11 @@ const Todo = (props: ITodoProps) => {
           'inWork': !checked ? listsInfo?.inWork - 1 : listsInfo?.inWork + 1,
         });
       }
+
     }
   }
 
-  const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {//onChange
     setEditTitle(e.target.value);
   }
 
@@ -114,15 +130,10 @@ const Todo = (props: ITodoProps) => {
 
     if (validation.isValid) {
       setEditError(null);
-      const objData = await editTodo(id, {isDone: checked, title: editTitle});
+      const response = await editTodo(id, {isDone: checked, title: editTitle});
   
-      if (objData?.status === 200) {
-        const index = todos.findIndex((item: IFullTodo) => item.id === id);
-        const newTodos = [
-          ...todos.slice(0, index), 
-          objData?.editedTodo,
-          ...todos.slice(index+1)];
-  
+      if (response?.status === 200) {
+        const newTodos = getEditTodos(id, todos, response?.editedTodo);
         setTodos(newTodos);
         setIsEdit(false);
       }
