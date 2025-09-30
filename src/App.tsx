@@ -1,27 +1,14 @@
 import { useState, useEffect} from 'react';
-import { createTodo, getAllTodos } from './api/api';
+import AddTodo from './components/add-todo/add-todo';
 import TodoList from './components/todo-list/todo-list';
-import Button from './components/button/button'
-import Input from './components/input/input'
 import Filters from './components/filters/filters';
-import type { IFullTodo } from './components/todo/todo';
-import { getValidation } from './utils/utils';
+import type { IFullTodo, TListsInfo, TFilter } from './types/types';
+import { getAllTodos } from './api/api';
 import s from './App.module.scss';
 
 
 
-export type TListsInfo = {
-  all: number,
-  completed: number,
-  inWork: number,
-} | null;
-
-export type TFilter = "all" | "completed" | "inWork";
-
-
 function App() {
-  const [title, setTitle] = useState<string>('');
-  const [error, setError] = useState<string|null>(null);
   const [todos, setTodos] = useState<IFullTodo[] | null>(null);
   const [listFilter, setListFilter] = useState<TFilter>("all");
   const [listsInfo, setListsInfo] = useState<TListsInfo>(null);
@@ -46,68 +33,19 @@ function App() {
   }, [listFilter]);
 
 
-
-  const handleForm = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const formElement = e.currentTarget;
-
-    const formData = new FormData(formElement); 
-    const titleValue = formData.get('title')?.toString().trim() || '';
-    const validation = getValidation(titleValue);
-
-    if (validation.isValid) {
-      setError(null);
-
-      const todo = {
-        isDone: false,
-        title: titleValue
-      }
-
-      const response = createTodo(todo);
-      response.then((newTodo) => {// ts
-        if (todos) {
-          if(listFilter !== 'completed') {
-            const newTodos: IFullTodo[] = todos?.length === 0 ? [newTodo] : [...todos, newTodo];
-            setTodos(newTodos);
-          }
-
-          if (listsInfo) {
-            setListsInfo({
-              'all': listsInfo?.all + 1,
-              'completed': newTodo?.isDone ? listsInfo?.completed + 1 : listsInfo?.completed,
-              'inWork': newTodo?.isDone ? listsInfo?.inWork : listsInfo?.inWork + 1,
-            });
-          } else setListsInfo({
-            'all': 1,
-            'completed': newTodo?.isDone ? 1 : 0,
-            'inWork': newTodo?.isDone ? 0 : 1,
-          });
-        }
-      });
-
-      // formElement.reset();
-      setTitle('');
-    }
-    else setError(validation.message);
-  }
-
   return (
     <div className={s.app}>
       <div className={s.card}>
         <h1 className={s.header}>To do</h1>
-        <form 
-          className={s.form}
-          onSubmit={handleForm}
-          >
-          <Input 
-            error={error}
-            name='title'
-            value={title}
-            onChange={(e) => {setTitle(e.target.value)}} 
-          />
-          <Button text="Add" type="submit"/>
-        </form>
+
+        <AddTodo 
+          todos={todos}
+          setTodos={setTodos}
+          listsInfo={listsInfo}
+          setListsInfo={setListsInfo}
+          listFilter={listFilter}
+        />
+
         <Filters 
           setListFilter={setListFilter}
           listsInfo={listsInfo}

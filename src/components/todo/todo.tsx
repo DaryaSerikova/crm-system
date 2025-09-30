@@ -1,19 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import { deleteTodo, editTodo } from '../../api/api';
-import type { TFilter, TListsInfo } from '../../App';
+import type { IFullTodo, TListsInfo, TFilter } from '../../types/types';
 import Button from '../button/button';
 import Input from '../input/input';
+import { deleteTodo, editTodo } from '../../api/api';
 import { getValidation } from '../../utils/utils';
 import s from './todo.module.scss';
 
 
-export interface IFullTodo {
-  created: string,
-  id: number,
-  isDone: boolean,
-  title: string,
-}
 
 interface ITodoProps {
   created: string,

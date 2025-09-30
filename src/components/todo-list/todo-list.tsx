@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
-import type { TFilter, TListsInfo } from '../../App';
-import Todo, { type IFullTodo } from '../todo/todo';
+import Todo from '../todo/todo';
+import type { IFullTodo, TListsInfo, TFilter } from '../../types/types';
 import s from './todo-list.module.scss';
 
 

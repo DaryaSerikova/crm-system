@@ -1,4 +1,4 @@
-import type { TFilter } from "../App";
+import type { TFilter } from "../types/types";
 
 const baseUrl = 'https://easydev.club/api/v1';
 
@@ -7,12 +7,6 @@ interface ITodo {
   title: string,
 }
 
-// interface IFullTodo {
-//   created: string,
-//   id: 0,
-//   isDone: true,
-//   title: string
-// }
 
 export const getAllTodos = async (filter: TFilter) => {
 

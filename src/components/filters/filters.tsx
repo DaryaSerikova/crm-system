@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import type { TFilter, TListsInfo } from '../../App';
+import type { TListsInfo, TFilter } from '../../types/types';
 import s from './filters.module.scss';
 
 
