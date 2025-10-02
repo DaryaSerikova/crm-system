@@ -10,10 +10,9 @@ interface ITodoListProps {
   setTodos: Dispatch<SetStateAction<IFullTodo[] | null>>
   listFilter: TFilter,
   setListsInfo: Dispatch<SetStateAction<TListsInfo>>,
-  listsInfo: TListsInfo,
 }
 
-const TodoList = ({ todos, setTodos, listFilter, setListsInfo, listsInfo }: ITodoListProps) => {
+const TodoList = ({ todos, setTodos, listFilter, setListsInfo }: ITodoListProps) => {
 
   return (
     <div className={s.todoList}>
@@ -28,7 +27,6 @@ const TodoList = ({ todos, setTodos, listFilter, setListsInfo, listsInfo }: ITod
           setTodos={setTodos}
           listFilter={listFilter}
           setListsInfo={setListsInfo}
-          listsInfo={listsInfo}
         />
       })}
     </div>

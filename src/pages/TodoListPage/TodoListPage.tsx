@@ -6,6 +6,7 @@ import type { IFullTodo, TFilter, TListsInfo } from '../../types/types';
 import { getAllTodos } from '../../api/api';
 import s from './TodoListPage.module.scss';
 
+
 // interface ITodoListPageProps {}
 
 const TodoListPage = () => {
@@ -41,9 +42,7 @@ const TodoListPage = () => {
         <h1 className={s.header}>To do</h1>
 
         <AddTodo 
-          todos={todos}
           setTodos={setTodos}
-          listsInfo={listsInfo}
           setListsInfo={setListsInfo}
           listFilter={listFilter}
         />
@@ -57,7 +56,6 @@ const TodoListPage = () => {
           setTodos={setTodos} 
           listFilter={listFilter}
           setListsInfo={setListsInfo}
-          listsInfo={listsInfo}
           />}
       </div>
     </div>

@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { IFullTodo, TListsInfo, TFilter } from '../../types/types';
 import Button from '../button/button';
 import Input from '../input/input';
-import { deleteTodo, editTodo } from '../../api/api';
+import { deleteTodo, editTodo, getAllTodos } from '../../api/api';
 import { getValidation } from '../../utils/utils';
 import s from './todo.module.scss';
 
@@ -18,18 +18,16 @@ interface ITodoProps {
   setTodos: Dispatch<SetStateAction<IFullTodo[] | null>>
   listFilter: TFilter,
   setListsInfo: Dispatch<SetStateAction<TListsInfo>>
-  listsInfo: TListsInfo,
 }
 
 const Todo = (props: ITodoProps) => {
 
-  const { id, title, isDone, todos, setTodos, listFilter, setListsInfo, listsInfo } = props;
+  const { id, title, isDone, todos, setTodos, listFilter, setListsInfo } = props;
 
   const [ checked, setChecked] = useState<boolean>(false); //null
   const [ isEdit, setIsEdit] = useState<boolean>(false);
-  const [editTitle, setEditTitle] = useState<string>(''); //null проверить как работает !!!!!
+  const [editTitle, setEditTitle] = useState<string>(''); //null 
   const [ editError, setEditError ] = useState<string | null>(null);
-  // const [toggleElement, setToggleElement] = useState(null);
 
   useEffect(() => {
     if (checked === null) setChecked(isDone);
@@ -54,64 +52,28 @@ const Todo = (props: ITodoProps) => {
 
 
   const handleDelete = async(id: number) => {
-    const response = await deleteTodo(id);
 
-    if (response?.status === 200) {
-      const newTodos = todos.filter((item) => (item.id !== id));
-      setTodos(newTodos);
-
-      if (listsInfo) {
-        const all = listsInfo?.all;
-        if (listFilter === 'all') {
-          setListsInfo({
-            'all': listsInfo?.all - 1,
-            'completed': checked ? listsInfo?.completed - 1 : listsInfo?.completed,
-            'inWork': checked ? listsInfo?.inWork : listsInfo?.inWork - 1,
-          });
-        } else {
-          setListsInfo({
-            'all': listsInfo?.all - 1,
-            'completed': listFilter === 'completed' ? newTodos.length : (all - 1) - newTodos.length,
-            'inWork': listFilter === 'inWork' ? newTodos.length : (all - 1) - newTodos.length,
-          });
-        }
-      }
+    const handleDeleteTodo = async () => {
+      await deleteTodo(id);
+      const newTodosInfo = await getAllTodos(listFilter);
+      setTodos(newTodosInfo?.data);
+      setListsInfo(newTodosInfo?.info);
     }
+
+    handleDeleteTodo();
   }
 
-  const getEditTodos = (id: number, todos: IFullTodo[], newElement: IFullTodo) => {
-    const index = todos.findIndex((item: IFullTodo) => item.id === id);
-    const newTodos = [
-      ...todos.slice(0, index), 
-      newElement, 
-      ...todos.slice(index+1)];
-    return newTodos;
-  }
+  const handleToggle = () => {
+    const handleToggleTodo = async () => {
+      await editTodo(id, {title: title, isDone: !checked});
+      setChecked(!checked);
 
-  const handleToggle = async () => {
-    const response = await editTodo(id, {title: title, isDone: !checked})
-    const newToggledTodo = response?.editedTodo;
-    setChecked(!checked);
-
-    if (response?.status === 200) {
-      if (listFilter ==='inWork' || listFilter === 'completed') {
-        const newTodos = todos.filter((item) => (item.id !== id));
-        setTodos(newTodos);
-      } 
-      if (listFilter ==='all') {
-        const newTodos = getEditTodos(id, todos, newToggledTodo);
-        setTodos(newTodos);
-      }
-
-      if (listsInfo) {
-        setListsInfo({
-          'all': listsInfo?.all, 
-          'completed': !checked ? listsInfo?.completed + 1 : listsInfo?.completed - 1, 
-          'inWork': !checked ? listsInfo?.inWork - 1 : listsInfo?.inWork + 1,
-        });
-      }
-
+      const newTodosInfo = await getAllTodos(listFilter);
+      setTodos(newTodosInfo?.data);
+      setListsInfo(newTodosInfo?.info);
     }
+
+    handleToggleTodo();
   }
 
   const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {//onChange
@@ -124,13 +86,17 @@ const Todo = (props: ITodoProps) => {
 
     if (validation.isValid) {
       setEditError(null);
-      const response = await editTodo(id, {isDone: checked, title: editTitle});
-  
-      if (response?.status === 200) {
-        const newTodos = getEditTodos(id, todos, response?.editedTodo);
-        setTodos(newTodos);
+
+      const handleEditTodo = async () => {
+        await editTodo(id, {isDone: checked, title: editTitle});
+        const newTodosInfo = await getAllTodos(listFilter);
         setIsEdit(false);
+        setTodos(newTodosInfo?.data);
+        // setListsInfo(newTodosInfo?.info);
       }
+  
+      handleEditTodo();
+  
     } else setEditError(validation.message);
   }
 
