@@ -1,23 +1,23 @@
 import type { Dispatch, SetStateAction } from 'react';
-import Todo from '../todo/todo';
-import type { IFullTodo, TListsInfo, TFilter } from '../../types/types';
+import TodoItem from '../todo-item/todo-item';
+import type { Todo, TodoInfo, Filter } from '../../types/types';
 import s from './todo-list.module.scss';
 
 
 
-interface ITodoListProps {
-  todos: IFullTodo[],
-  setTodos: Dispatch<SetStateAction<IFullTodo[] | null>>
-  listFilter: TFilter,
-  setListsInfo: Dispatch<SetStateAction<TListsInfo>>,
+interface TodoListProps {
+  todos: Todo[],
+  setTodos: Dispatch<SetStateAction<Todo[] | null>>
+  listFilter: Filter,
+  setListsInfo: Dispatch<SetStateAction<TodoInfo>>,
 }
 
-const TodoList = ({ todos, setTodos, listFilter, setListsInfo }: ITodoListProps) => {
+const TodoList = ({ todos, setTodos, listFilter, setListsInfo }: TodoListProps) => {
 
   return (
     <div className={s.todoList}>
-      {todos?.map((item: IFullTodo) => {
-        return <Todo 
+      {todos?.map((item: Todo) => {
+        return <TodoItem 
           id={item.id}
           key={item.id}
           isDone={item.isDone}

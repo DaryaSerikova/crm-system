@@ -6,9 +6,7 @@ import TodoListPage from './pages/TodoListPage/TodoListPage';
 function App() {
 
   return (
-    <>
-      <TodoListPage />
-    </>
+    <TodoListPage />
   )
 }
 

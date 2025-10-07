@@ -1,37 +1,37 @@
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import type { TListsInfo, TFilter } from '../../types/types';
-import s from './filters.module.scss';
+import type { TodoInfo, Filter } from '../../types/types';
+import s from './todo-filters.module.scss'
 
 
 
-interface IFiltersProps {
-  setListFilter: Dispatch<SetStateAction<TFilter>>,
-  listsInfo: TListsInfo,
+interface FiltersProps {
+  setListFilter: Dispatch<SetStateAction<Filter>>,
+  listsInfo: TodoInfo,
 }
-type TFiltersValues = {1: 'all', 2:'inWork', 3:'completed'};
-type TFilterIds = 1 | 2 | 3;
+type FiltersValues = {1: 'all', 2:'inWork', 3:'completed'};
+type FilterIds = 1 | 2 | 3;
 
-interface IFilters {
-  id: TFilterIds,
-  value: TFilter,
+interface FiltersValueLabel {
+  id: FilterIds,
+  value: Filter,
   label: string,
 }
 
 
-const Filters = ({ setListFilter, listsInfo }: IFiltersProps) => {
-  const [currentFilterId, setCurrentFilterId] = useState<TFilterIds>(1);
+const TodoFilters = ({ setListFilter, listsInfo }: FiltersProps) => {
+  const [currentFilterId, setCurrentFilterId] = useState<FilterIds>(1);
 
-  const filtersArray: IFilters[] = [
+  const filtersArray: FiltersValueLabel[] = [
     {id: 1, value: 'all', label: 'Все'},
     {id: 2, value: 'inWork', label: 'В прогрессе'},
     {id: 3, value: 'completed', label: 'Завершенные'},
   ];
-  const filtersValues: TFiltersValues = {1: 'all', 2:'inWork', 3:'completed'};
+  const filtersValues: FiltersValues = {1: 'all', 2:'inWork', 3:'completed'};
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const id = +e.currentTarget.id as TFilterIds;
-    const filter: TFilter = filtersValues[`${id}`];
+    const id = +e.currentTarget.id as FilterIds;
+    const filter: Filter = filtersValues[`${id}`];
     setListFilter(filter);
     setCurrentFilterId(id);
   }
@@ -39,7 +39,7 @@ const Filters = ({ setListFilter, listsInfo }: IFiltersProps) => {
 
   return (
     <div className={s.filters}>
-      {filtersArray.map((item: IFilters) => 
+      {filtersArray.map((item: FiltersValueLabel) => 
         <div 
           className={`${s.tab} ${currentFilterId === item.id ? s.isActive : ''}`} 
           key={item.id}
@@ -55,4 +55,4 @@ const Filters = ({ setListFilter, listsInfo }: IFiltersProps) => {
   )
 }
 
-export default Filters;
+export default TodoFilters;

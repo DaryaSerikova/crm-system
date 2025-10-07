@@ -1,14 +1,14 @@
 import s from './input.module.scss';
 
 
-interface IInput {
+interface InputProps {
   error: string | null,
   name: string,
   value: string,
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
 }
 
-const Input = (props: IInput) => {
+const Input = (props: InputProps) => {
   const {error, name, value, onChange} = props;
 
   // const [taskTitle, setTaskTitle] = useState<string>('');

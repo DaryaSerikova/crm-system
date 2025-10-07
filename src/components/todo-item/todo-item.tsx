@@ -1,26 +1,26 @@
 import { useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import type { IFullTodo, TListsInfo, TFilter } from '../../types/types';
+import type { Todo, TodoInfo, Filter } from '../../types/types';
 import Button from '../button/button';
 import Input from '../input/input';
 import { deleteTodo, editTodo, getAllTodos } from '../../api/api';
-import { getValidation } from '../../utils/utils';
-import s from './todo.module.scss';
+import { getValidationMessage } from '../../utils/utils';
+import s from './todo-item.module.scss'
 
 
 
-interface ITodoProps {
+interface TodoProps {
   created: string,
   id: number,
   isDone: boolean,
   title: string,
-  todos: IFullTodo[],
-  setTodos: Dispatch<SetStateAction<IFullTodo[] | null>>
-  listFilter: TFilter,
-  setListsInfo: Dispatch<SetStateAction<TListsInfo>>
+  todos: Todo[],
+  setTodos: Dispatch<SetStateAction<Todo[] | null>>
+  listFilter: Filter,
+  setListsInfo: Dispatch<SetStateAction<TodoInfo>>
 }
 
-const Todo = (props: ITodoProps) => {
+const TodoItem = (props: TodoProps) => {
 
   const { id, title, isDone, todos, setTodos, listFilter, setListsInfo } = props;
 
@@ -82,9 +82,9 @@ const Todo = (props: ITodoProps) => {
 
   const handleEditForm = async (e: React.FormEvent<HTMLFormElement>) => { 
     e.preventDefault();
-    const validation = getValidation(editTitle);
+    const validationMessage = getValidationMessage(editTitle);
 
-    if (validation.isValid) {
+    if (validationMessage === null) {
       setEditError(null);
 
       const handleEditTodo = async () => {
@@ -97,7 +97,8 @@ const Todo = (props: ITodoProps) => {
   
       handleEditTodo();
   
-    } else setEditError(validation.message);
+    } else setEditError(validationMessage);
+
   }
 
   const handleCancel = () => {
@@ -164,4 +165,4 @@ const Todo = (props: ITodoProps) => {
 }
 
 
-export default Todo;
+export default TodoItem;

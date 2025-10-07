@@ -1,30 +1,26 @@
-import type { TFilter } from "../types/types";
+import type { MetaResponse, Filter, TodoRequest, Todo } from "../types/types";
+
 
 const baseUrl = 'https://easydev.club/api/v1';
 
-interface ITodo {
-  isDone: boolean,
-  title: string,
-}
+export const getAllTodos = async (filter: Filter) => {
 
-
-export const getAllTodos = async (filter: TFilter) => {
-
-  const searchParams = new URLSearchParams({
+  const searchParams = new URLSearchParams({ //здесь можно сделать поприятнее д/глаза
     'filter': `${filter}`,
   });
 
   try {
     const response = await fetch(`${baseUrl}/todos?${searchParams.toString()}`);
     // const response = await fetch(`${baseUrl}/todos`);
-    const data = await response.json();
+    const data: MetaResponse<Todo, Filter> = await response.json();
+
     return data;
   } catch (err) {
     console.error('Error (getTodos), err: ', err);
   }
 }
 
-export const createTodo = async (todo: ITodo) => {
+export const createTodo = async (todo: TodoRequest) => {
   try {
     const response = await fetch(`${baseUrl}/todos`, {
       method: 'POST',
@@ -34,7 +30,7 @@ export const createTodo = async (todo: ITodo) => {
       }
     });
 
-    const newTodo = await response.json();
+    const newTodo: Todo = await response.json();
     return newTodo;
 
   } catch (err) {
@@ -42,7 +38,7 @@ export const createTodo = async (todo: ITodo) => {
   }
 }
 
-export const editTodo = async (id: number, todo: ITodo) => {
+export const editTodo = async (id: number, todo: TodoRequest) => {
   try {
     const response = await fetch(`${baseUrl}/todos/${id}`, {
       method: 'PUT',
@@ -51,7 +47,9 @@ export const editTodo = async (id: number, todo: ITodo) => {
         'Content-Type' : 'application/json',
       },
     });
-    const data = await response.json();
+    const data: Todo = await response.json();
+    console.log('data: ', data)
+
     return {editedTodo: data, status: response.status};
 
   } catch (err) {
