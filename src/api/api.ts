@@ -5,18 +5,23 @@ const baseUrl = 'https://easydev.club/api/v1';
 
 export const getAllTodos = async (filter: Filter) => {
 
-  const searchParams = new URLSearchParams({ //здесь можно сделать поприятнее д/глаза
-    'filter': `${filter}`,
+  const searchParams = new URLSearchParams({
+    filter: `${filter}`,
   });
 
   try {
     const response = await fetch(`${baseUrl}/todos?${searchParams.toString()}`);
-    // const response = await fetch(`${baseUrl}/todos`);
-    const data: MetaResponse<Todo, Filter> = await response.json();
+    // const response = undefined;
 
+
+    if(!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data: MetaResponse<Todo, Filter> = await response.json();
     return data;
   } catch (err) {
-    console.error('Error (getTodos), err: ', err);
+    // console.error('Error (getTodos), err: ', err);
+    throw new Error(`Failed to fetch todos: ${err.message}`)
   }
 }
 

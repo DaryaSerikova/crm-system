@@ -1,19 +1,22 @@
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import { useState } from 'react';
 import Input from '../input/input';
 import Button from '../button/button';
-import type { Todo, TodoRequest, Filter, TodoInfo } from '../../types/types';
-import { createTodo, getAllTodos } from '../../api/api';
+import type { TodoRequest, Filter } from '../../types/types';
+import { createTodo } from '../../api/api';
 import { getValidationMessage } from '../../utils/utils';
 import s from './add-todo.module.scss';
 
 
 interface AddTodoProps {
-  setTodos: Dispatch<SetStateAction<Todo[] | null>>,
-  setListsInfo: Dispatch<SetStateAction<TodoInfo>>
+  // setTodos: Dispatch<SetStateAction<Todo[] | null>>,
+  // setListsInfo: Dispatch<SetStateAction<TodoInfo>>
   listFilter: Filter,
+  onUpdate: (listFilter: Filter) => Promise<void>,
 }
 
-const AddTodo = ({ setTodos, setListsInfo, listFilter}: AddTodoProps) => {
+const AddTodo = ({ listFilter, onUpdate,
+  // setTodos, setListsInfo, 
+}: AddTodoProps) => {
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
 
@@ -37,9 +40,10 @@ const AddTodo = ({ setTodos, setListsInfo, listFilter}: AddTodoProps) => {
 
       const handleCreateTodo = async () => {
         await createTodo(todo);
-        const newTodosInfo = await getAllTodos(listFilter);
-        setTodos(newTodosInfo?.data);
-        setListsInfo(newTodosInfo?.info);
+        await onUpdate(listFilter);
+        // const newTodosInfo = await getAllTodos(listFilter);
+        // setTodos(newTodosInfo?.data);
+        // setListsInfo(newTodosInfo?.info);
       }
 
       handleCreateTodo();
@@ -47,7 +51,6 @@ const AddTodo = ({ setTodos, setListsInfo, listFilter}: AddTodoProps) => {
       // formElement.reset();
       setTitle('');
     }
-    // else setError(validation.message);
     else setError(validationMessage);
 
   }

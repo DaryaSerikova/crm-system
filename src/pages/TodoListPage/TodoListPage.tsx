@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AddTodo from '../../components/add-todo/add-todo';
 import TodoFilters from '../../components/todo-filters/todo-filters';
 import TodoList from '../../components/todo-list/todo-list';
@@ -16,23 +16,29 @@ const TodoListPage = () => {
   const [listFilter, setListFilter] = useState<Filter>("all");
   const [listsInfo, setListsInfo] = useState<TodoInfo>(null);
 
-  useEffect(() => {
-    if (todos === null) {
-      getAllTodos(listFilter).then(allTodos => {
+
+  const fetchAndSetTodos = useCallback(async (listFilter: Filter) => {
+    return getAllTodos(listFilter)
+      .then(allTodos => {
         setTodos(allTodos.data);
         setListsInfo(allTodos.info);
-      });
-    }
+      }).catch((err) => {
+        alert(`
+          NAME: ${err.name}, 
+          MESSAGE: ${err.message}, 
+          STACK: ${err.stack}
+        `);
+      })
+  }, []);//создается один раз
+
+  useEffect(() => {
+    fetchAndSetTodos(listFilter);
   }, []);
 
   useEffect(() => {
     if (todos !== null) {
-      getAllTodos(listFilter).then(allTodos => {
-        setTodos(allTodos.data);
-        setListsInfo(allTodos.info);
-      });
+      fetchAndSetTodos(listFilter);
     }
-    
   }, [listFilter]);
 
 
@@ -42,8 +48,9 @@ const TodoListPage = () => {
         <h1 className={s.header}>To do</h1>
 
         <AddTodo 
-          setTodos={setTodos}
-          setListsInfo={setListsInfo}
+          // setTodos={setTodos}
+          // setListsInfo={setListsInfo}
+          onUpdate={fetchAndSetTodos}
           listFilter={listFilter}
         />
 
