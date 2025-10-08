@@ -1,17 +1,21 @@
 import s from './button.module.scss';
 
 interface ButtonProps {
-  text: string,
+  children: React.ReactNode,
   type?: "button" | "submit" | "reset",
   onClick?: () => void,
 }
 
-const Button = (props: ButtonProps) => { //children
-  const { text, type="button", onClick } = props;
+const Button = (props: ButtonProps) => {
+  const { type="button", onClick, children } = props;
 
   return (
-    <button className={s.button} type={type} onClick={onClick}>
-      {text}
+    <button 
+      className={s.button} 
+      type={type} 
+      onClick={onClick}
+    >
+      {children}
     </button>
   )
 }

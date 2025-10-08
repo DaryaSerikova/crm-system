@@ -128,12 +128,14 @@ const TodoItem = (props: TodoProps) => {
           <div className={s.buttons}>
             <Button
               type='submit' 
-              text="Save"
-            />
+            >
+              Save
+            </Button>
             <Button 
-              text="Cancel"
               onClick={() => handleCancel()}
-            />
+            >
+              Cancel
+            </Button>
           </div>
         </form>
         </> 
@@ -150,14 +152,16 @@ const TodoItem = (props: TodoProps) => {
           <div className={s.buttons}>
             <Button 
               type='button'
-              text='Edit'
               onClick={() => {setIsEdit(true)}}
-            />
+            >
+              Edit
+            </Button>
             <Button 
               type='button'
-              text='Delete'
               onClick={() => handleDelete(id)}
-            />
+            >
+              Delete
+            </Button>
           </div>
         </>}
     </div>

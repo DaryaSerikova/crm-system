@@ -67,7 +67,7 @@ const AddTodo = ({ listFilter, onUpdate,
         value={title}
         onChange={(e) => {setTitle(e.target.value)}} 
       />
-      <Button text="Add" type="submit"/>
+      <Button type="submit">Add</Button>
     </form>
   )
 }
