@@ -20,33 +20,25 @@ const AddTodo = ({ listFilter, onUpdate,
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
 
-  const handleForm = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => { //handleForm
     e.preventDefault();
-
-    const formElement = e.currentTarget;
-
-    const formData = new FormData(formElement); 
-    const titleValue = formData.get('title')?.toString().trim() || '';
-    const validationMessage: string | null = getValidationMessage(titleValue);
-
+    const validationMessage: string | null = getValidationMessage(title); //titleValue
 
     if (validationMessage === null) {
       setError(null);
 
       const todo: TodoRequest = {
         isDone: false,
-        title: titleValue
+        title: title //titleValue
       }
 
-      const handleCreateTodo = async () => {
+      //try catch и вывод юзеру
+      try {
         await createTodo(todo);
-        await onUpdate(listFilter);
-        // const newTodosInfo = await getAllTodos(listFilter);
-        // setTodos(newTodosInfo?.data);
-        // setListsInfo(newTodosInfo?.info);
+      } catch (err) {
+        alert(`${err.message}`)
       }
-
-      handleCreateTodo();
+      await onUpdate(listFilter);
 
       // formElement.reset();
       setTitle('');
@@ -59,7 +51,7 @@ const AddTodo = ({ listFilter, onUpdate,
   return (
     <form 
       className={s.form}
-      onSubmit={handleForm}
+      onSubmit={handleSubmitForm} 
       >
       <Input 
         error={error}

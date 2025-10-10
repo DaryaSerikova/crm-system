@@ -126,14 +126,10 @@ const TodoItem = (props: TodoProps) => {
             />
           </div>
           <div className={s.buttons}>
-            <Button
-              type='submit' 
-            >
+            <Button type='submit'>
               Save
             </Button>
-            <Button 
-              onClick={() => handleCancel()}
-            >
+            <Button onClick={() => handleCancel()}>
               Cancel
             </Button>
           </div>
