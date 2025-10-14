@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
-import type { Todo, TodoInfo, Filter } from '../../types/types';
+import type { Todo, Filter } from '../../types/types';
 import Button from '../button/button';
 import Input from '../input/input';
-import { deleteTodo, editTodo, getAllTodos } from '../../api/api';
+import { deleteTodo, editTodo } from '../../api/api';
 import { getValidationMessage } from '../../utils/utils';
 import s from './todo-item.module.scss'
 
@@ -15,19 +14,24 @@ interface TodoProps {
   isDone: boolean,
   title: string,
   todos: Todo[],
-  setTodos: Dispatch<SetStateAction<Todo[] | null>>
   listFilter: Filter,
-  setListsInfo: Dispatch<SetStateAction<TodoInfo>>
+  onUpdate: (listFilter: Filter) => Promise<void>,
 }
 
 const TodoItem = (props: TodoProps) => {
 
-  const { id, title, isDone, todos, setTodos, listFilter, setListsInfo } = props;
+  const { id, title, isDone, todos, onUpdate, listFilter } = props;
 
   const [ checked, setChecked] = useState<boolean>(false); //null
   const [ isEdit, setIsEdit] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState<string>(''); //null 
   const [ editError, setEditError ] = useState<string | null>(null);
+
+  const handleCancel = () => {
+    setEditTitle(title);
+    setEditError(null);
+    setIsEdit(false);
+  }
 
   useEffect(() => {
     if (checked === null) setChecked(isDone);
@@ -42,38 +46,33 @@ const TodoItem = (props: TodoProps) => {
     setEditTitle(title);
   }, [title]);
 
-  useEffect(() => {
-    if(isEdit === true) {
-      setEditTitle(title);
-      setEditError(null);
-      setIsEdit(false);
+  useEffect(() => { //это нужно, чтобы при смене вкладки сбрасывалось редактирование
+    if (isEdit === true) {
+      handleCancel();
     }
   }, [listFilter])
 
-
   const handleDelete = async(id: number) => {
-
-    const handleDeleteTodo = async () => {
+    try {
       await deleteTodo(id);
-      const newTodosInfo = await getAllTodos(listFilter);
-      setTodos(newTodosInfo?.data);
-      setListsInfo(newTodosInfo?.info);
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(`${err.message}`);
+      }
     }
-
-    handleDeleteTodo();
+    await onUpdate(listFilter);
   }
 
-  const handleToggle = () => {
-    const handleToggleTodo = async () => {
+  const handleToggle = async () => {
+    try {
       await editTodo(id, {title: title, isDone: !checked});
-      setChecked(!checked);
-
-      const newTodosInfo = await getAllTodos(listFilter);
-      setTodos(newTodosInfo?.data);
-      setListsInfo(newTodosInfo?.info);
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(`${err.message}`);
+      }
     }
-
-    handleToggleTodo();
+    setChecked(!checked);
+    await onUpdate(listFilter);
   }
 
   const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {//onChange
@@ -86,29 +85,21 @@ const TodoItem = (props: TodoProps) => {
 
     if (validationMessage === null) {
       setEditError(null);
-
-      const handleEditTodo = async () => {
+      try {
         await editTodo(id, {isDone: checked, title: editTitle});
-        const newTodosInfo = await getAllTodos(listFilter);
-        setIsEdit(false);
-        setTodos(newTodosInfo?.data);
-        // setListsInfo(newTodosInfo?.info);
+      } catch (err) {
+        if (err instanceof Error) {
+          alert(`${err.message}`)
+        }
       }
-  
-      handleEditTodo();
-  
+      setIsEdit(false);
+      await onUpdate(listFilter);
     } else setEditError(validationMessage);
-
   }
 
-  const handleCancel = () => {
-    setEditTitle(title);
-    setEditError(null);
-    setIsEdit(false);
-  }
 
   return (
-    <div className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
+    <li className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
       {isEdit ? <>
         <form className={s.editForm} onSubmit={handleEditForm}>
           <div className={s.editTodo}>
@@ -160,7 +151,7 @@ const TodoItem = (props: TodoProps) => {
             </Button>
           </div>
         </>}
-    </div>
+    </li>
   )
 }
 

@@ -1,21 +1,19 @@
-import type { Dispatch, SetStateAction } from 'react';
 import TodoItem from '../todo-item/todo-item';
-import type { Todo, TodoInfo, Filter } from '../../types/types';
+import type { Todo, Filter } from '../../types/types';
 import s from './todo-list.module.scss';
 
 
 
 interface TodoListProps {
   todos: Todo[],
-  setTodos: Dispatch<SetStateAction<Todo[] | null>>
+  onUpdate: (listFilter: Filter) => Promise<void>,
   listFilter: Filter,
-  setListsInfo: Dispatch<SetStateAction<TodoInfo>>,
 }
 
-const TodoList = ({ todos, setTodos, listFilter, setListsInfo }: TodoListProps) => {
+const TodoList = ({ todos, onUpdate, listFilter }: TodoListProps) => {
 
   return (
-    <div className={s.todoList}>
+    <ul className={s.todoList}>
       {todos?.map((item: Todo) => {
         return <TodoItem 
           id={item.id}
@@ -24,12 +22,11 @@ const TodoList = ({ todos, setTodos, listFilter, setListsInfo }: TodoListProps) 
           title={item.title}
           created={item.created}
           todos={todos}
-          setTodos={setTodos}
           listFilter={listFilter}
-          setListsInfo={setListsInfo}
+          onUpdate={onUpdate}
         />
       })}
-    </div>
+    </ul>
   )
 };
 

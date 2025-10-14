@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import type { Dispatch, SetStateAction } from 'react';
 import type { TodoInfo, Filter } from '../../types/types';
 import s from './todo-filters.module.scss'
@@ -7,7 +8,7 @@ import s from './todo-filters.module.scss'
 
 interface FiltersProps {
   setListFilter: Dispatch<SetStateAction<Filter>>,
-  listsInfo: TodoInfo,
+  listsInfo: TodoInfo | null,
 }
 
 interface FiltersValueLabel {
@@ -18,6 +19,7 @@ interface FiltersValueLabel {
 const TodoFilters = ({ setListFilter, listsInfo }: FiltersProps) => {
   const [currentValue, setCurrentValue] = useState<Filter>('all');
 
+
   const filtersArray: FiltersValueLabel[] = [
     {value: 'all', label: 'Все'},
     {value: 'inWork', label: 'В прогрессе'},
@@ -25,11 +27,14 @@ const TodoFilters = ({ setListFilter, listsInfo }: FiltersProps) => {
   ];
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const filterValue = e.target?.dataset?.value; 
-    //а как если не через DOM узнать, какой текущий активный filter???
+    
+    if (e.target instanceof HTMLElement) {
+      const filterValue: Filter = e.target?.dataset?.value as Filter; //это отчаяние
+      setListFilter(filterValue);
+      setCurrentValue(filterValue);
+    }
+    //а как если не через DOM узнать, какой текущий активный filter ???
     //сейчас по клику и data-атрибутам можно точно определить какой нажат элемент
-    setListFilter(filterValue);
-    setCurrentValue(filterValue);
   }
 
 

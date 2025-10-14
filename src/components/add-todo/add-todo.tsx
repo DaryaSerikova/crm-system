@@ -8,15 +8,11 @@ import s from './add-todo.module.scss';
 
 
 interface AddTodoProps {
-  // setTodos: Dispatch<SetStateAction<Todo[] | null>>,
-  // setListsInfo: Dispatch<SetStateAction<TodoInfo>>
   listFilter: Filter,
   onUpdate: (listFilter: Filter) => Promise<void>,
 }
 
-const AddTodo = ({ listFilter, onUpdate,
-  // setTodos, setListsInfo, 
-}: AddTodoProps) => {
+const AddTodo = ({ onUpdate, listFilter }: AddTodoProps) => {
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
 
@@ -32,15 +28,16 @@ const AddTodo = ({ listFilter, onUpdate,
         title: title //titleValue
       }
 
-      //try catch и вывод юзеру
       try {
         await createTodo(todo);
       } catch (err) {
-        alert(`${err.message}`)
+        if (err instanceof Error) {
+          alert(`${err.message}`)
+        }
       }
       await onUpdate(listFilter);
+      // await onUpdate();
 
-      // formElement.reset();
       setTitle('');
     }
     else setError(validationMessage);

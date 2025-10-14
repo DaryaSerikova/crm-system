@@ -2,32 +2,34 @@ import { useState, useEffect, useCallback } from 'react';
 import AddTodo from '../../components/add-todo/add-todo';
 import TodoFilters from '../../components/todo-filters/todo-filters';
 import TodoList from '../../components/todo-list/todo-list';
-import type { Todo, Filter, TodoInfo } from '../../types/types';
+import type { Todo, Filter, TodoInfo, MetaResponse } from '../../types/types';
 import { getAllTodos } from '../../api/api';
 import s from './TodoListPage.module.scss';
 
 
-// interface TodoListPageProps {}
 
 const TodoListPage = () => {
-// const TodoListPage = (props: TodoListPageProps) => {
 
   const [todos, setTodos] = useState<Todo[] | null>(null);
   const [listFilter, setListFilter] = useState<Filter>("all");
-  const [listsInfo, setListsInfo] = useState<TodoInfo>(null);
+  const [listsInfo, setListsInfo] = useState<TodoInfo | null>(null);
 
 
   const fetchAndSetTodos = useCallback(async (listFilter: Filter) => {
+    console.log('fetchAndSetTodos | listFilter: ', listFilter)
     return getAllTodos(listFilter)
-      .then(allTodos => {
+      .then((allTodos: MetaResponse<Todo, TodoInfo>) => {
         setTodos(allTodos.data);
-        setListsInfo(allTodos.info);
+        if (allTodos.info) setListsInfo(allTodos.info); 
+        //из-за ts и MetaResponse, info? - поэтому мб undefined
       }).catch((err) => {
-        alert(`
-          NAME: ${err.name}, 
-          MESSAGE: ${err.message}, 
-          STACK: ${err.stack}
-        `);
+        if (err instanceof Error) {
+          alert(`
+            NAME: ${err.name}, 
+            MESSAGE: ${err.message}, 
+            STACK: ${err.stack}
+          `);
+        }
       })
   }, []);//создается один раз
 
@@ -48,10 +50,8 @@ const TodoListPage = () => {
         <h1 className={s.header}>To do</h1>
 
         <AddTodo 
-          // setTodos={setTodos}
-          // setListsInfo={setListsInfo}
-          onUpdate={fetchAndSetTodos}
           listFilter={listFilter}
+          onUpdate={fetchAndSetTodos}
         />
 
         <TodoFilters 
@@ -60,9 +60,8 @@ const TodoListPage = () => {
         />
         { todos && <TodoList 
           todos={todos} 
-          setTodos={setTodos} 
           listFilter={listFilter}
-          setListsInfo={setListsInfo}
+          onUpdate={fetchAndSetTodos}
           />}
       </div>
     </div>
