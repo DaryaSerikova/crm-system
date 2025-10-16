@@ -1,4 +1,4 @@
-export const getValidationMessage = (str: string) => { 
+export const getValidationMessage = (str: string) => { //Быстрый выход, Return Early Pattern
   if (str.length === 0) {
     return "Поле не может быть пустым!";
   }
