@@ -26,15 +26,9 @@ const TodoFilters = ({ setListFilter, listsInfo }: FiltersProps) => {
     {value: 'completed', label: 'Завершенные'},
   ];
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    
-    if (e.target instanceof HTMLElement) {
-      const filterValue: Filter = e.target?.dataset?.value as Filter; //это отчаяние
-      setListFilter(filterValue);
-      setCurrentValue(filterValue);
-    }
-    //а как если не через DOM узнать, какой текущий активный filter ???
-    //сейчас по клику и data-атрибутам можно точно определить какой нажат элемент
+  const handleClick = (filterValue: Filter) => {
+    setListFilter(filterValue);
+    setCurrentValue(filterValue);
   }
 
 
@@ -44,8 +38,7 @@ const TodoFilters = ({ setListFilter, listsInfo }: FiltersProps) => {
         <div 
           className={`${s.tab} ${currentValue === item.value ? s.isActive : ''}`} 
           key={item.value}
-          data-value={item.value}
-          onClick={handleClick}
+          onClick={() => handleClick(item.value)}
         >
           {item.label} ({listsInfo?.[`${item.value}`]})
           {/* количество задач не меняется в завершенных и в работе, если сделать toggle/delete/add */}

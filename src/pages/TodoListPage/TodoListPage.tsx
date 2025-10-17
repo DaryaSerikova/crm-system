@@ -20,8 +20,9 @@ const TodoListPage = () => {
     return getAllTodos(listFilter)
       .then((allTodos: MetaResponse<Todo, TodoInfo>) => {
         setTodos(allTodos.data);
-        if (allTodos.info) setListsInfo(allTodos.info); 
-        //из-за ts и MetaResponse, info? - поэтому мб undefined
+        if (allTodos.info) {//if из-за ts и MetaResponse, info? - поэтому мб undefined
+          setListsInfo(allTodos.info); 
+        }
       }).catch((err) => {
         if (err instanceof Error) {
           alert(`

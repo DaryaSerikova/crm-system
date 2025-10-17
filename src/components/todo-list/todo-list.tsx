@@ -16,11 +16,8 @@ const TodoList = ({ todos, onUpdate, listFilter }: TodoListProps) => {
     <ul className={s.todoList}>
       {todos?.map((item: Todo) => {
         return <TodoItem 
-          id={item.id}
           key={item.id}
-          isDone={item.isDone}
-          title={item.title}
-          created={item.created}
+          todo={item}
           todos={todos}
           listFilter={listFilter}
           onUpdate={onUpdate}
