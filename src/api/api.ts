@@ -73,7 +73,7 @@ export const editTodo = async (id: number, todo: TodoRequest): Promise<{editedTo
   }
 }
 
-export const deleteTodo = async (id: number) => { //типизировать возврат функции
+export const deleteTodo = async (id: number): Promise<undefined> => { //типизировать возврат функции
   try {
     const response = await fetch(`${baseUrl}/todos/${id}`, {
       method: 'DELETE',
@@ -86,7 +86,7 @@ export const deleteTodo = async (id: number) => { //типизировать в�
     if(!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    return response;
+    // return response;
 
   } catch (err: unknown) {
     if (err instanceof Error) {

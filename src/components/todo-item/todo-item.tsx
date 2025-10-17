@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Todo, Filter } from '../../types/types';
+import type { Todo } from '../../types/types';
 import Button from '../button/button';
 import Input from '../input/input';
 import { deleteTodo, editTodo } from '../../api/api';
@@ -10,19 +10,10 @@ import s from './todo-item.module.scss'
 
 interface TodoProps {
   todo: Todo,
-  todos: Todo[],
-  listFilter: Filter,
-  onUpdate: (listFilter: Filter) => Promise<void>,
+  onUpdate: () => Promise<void>,
 }
 
-const TodoItem = (props: TodoProps) => {
-  const { 
-    todo, 
-    onUpdate, 
-    // todos, 
-    listFilter, 
-  } = props;
-
+const TodoItem = ({todo, onUpdate }: TodoProps) => {
   const {id, title, isDone} = todo;
 
   const [ isEdit, setIsEdit] = useState<boolean>(false);
@@ -36,11 +27,11 @@ const TodoItem = (props: TodoProps) => {
     setIsEdit(false);
   }
 
-  useEffect(() => { //это нужно, чтобы при смене вкладки сбрасывалось редактирование
-    if (isEdit === true) {
-      handleCancel();
-    }
-  }, [listFilter]);
+  // useEffect(() => { //это нужно, чтобы при смене вкладки сбрасывалось редактирование
+  //   if (isEdit === true) {
+  //     handleCancel();
+  //   }
+  // }, [listFilter]);
 
 
 
@@ -56,7 +47,7 @@ const TodoItem = (props: TodoProps) => {
         alert(`${err.message}`);
       }
     }
-    await onUpdate(listFilter);
+    await onUpdate();
   }
 
   const handleToggle = async () => {
@@ -67,8 +58,8 @@ const TodoItem = (props: TodoProps) => {
         alert(`${err.message}`);
       }
     }
-    // setChecked(!checked);
-    await onUpdate(listFilter);
+    await onUpdate();
+
   }
 
   const onClickEdit = () => {
@@ -95,7 +86,8 @@ const TodoItem = (props: TodoProps) => {
         }
       }
       setIsEdit(false);
-      await onUpdate(listFilter);
+      await onUpdate();
+
     } else setEditError(validationMessage);
   }
 

@@ -50,19 +50,15 @@ const TodoListPage = () => {
       <div className={s.card}>
         <h1 className={s.header}>To do</h1>
 
-        <AddTodo 
-          listFilter={listFilter}
-          onUpdate={fetchAndSetTodos}
-        />
+        <AddTodo onUpdate={() => fetchAndSetTodos(listFilter)}/>
 
         <TodoFilters 
           setListFilter={setListFilter}
           listsInfo={listsInfo}
         />
         { todos && <TodoList 
-          todos={todos} 
-          listFilter={listFilter}
-          onUpdate={fetchAndSetTodos}
+            todos={todos} 
+            onUpdate={() => fetchAndSetTodos(listFilter)}
           />}
       </div>
     </div>

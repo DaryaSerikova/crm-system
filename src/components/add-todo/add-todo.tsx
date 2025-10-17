@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import Input from '../input/input';
 import Button from '../button/button';
-import type { TodoRequest, Filter } from '../../types/types';
+import type { TodoRequest } from '../../types/types';
 import { createTodo } from '../../api/api';
 import { getValidationMessage } from '../../utils/utils';
 import s from './add-todo.module.scss';
 
 
 interface AddTodoProps {
-  listFilter: Filter,
-  onUpdate: (listFilter: Filter) => Promise<void>,
+  // listFilter: Filter,
+  // onUpdate: (listFilter: Filter) => Promise<void>,
+  onUpdate: () => Promise<void>,
 }
 
-const AddTodo = ({ onUpdate, listFilter }: AddTodoProps) => {
+const AddTodo = ({ onUpdate, 
+  // listFilter 
+}: AddTodoProps) => {
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
 
@@ -35,8 +38,8 @@ const AddTodo = ({ onUpdate, listFilter }: AddTodoProps) => {
           alert(`${err.message}`)
         }
       }
-      await onUpdate(listFilter);
-      // await onUpdate();
+      // await onUpdate(listFilter);
+      await onUpdate();
 
       setTitle('');
     }
