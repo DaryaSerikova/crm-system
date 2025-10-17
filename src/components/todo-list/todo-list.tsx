@@ -1,5 +1,5 @@
 import TodoItem from '../todo-item/todo-item';
-import type { Todo } from '../../types/types';
+import type { Filter, Todo } from '../../types/types';
 import s from './todo-list.module.scss';
 
 
@@ -7,17 +7,20 @@ import s from './todo-list.module.scss';
 interface TodoListProps {
   todos: Todo[],
   onUpdate: () => Promise<void>,
+  listFilter: Filter,
 }
 
-const TodoList = ({ todos, onUpdate }: TodoListProps) => {
+const TodoList = ({ todos, onUpdate, listFilter }: TodoListProps) => {
 
   return (
     <ul className={s.todoList}>
       {todos?.map((item: Todo) => {
         return <TodoItem 
+          // key={`${item.id}-todo${listFilter}`}
           key={item.id}
           todo={item}
           onUpdate={onUpdate}
+          listFilter={listFilter}
         />
       })}
     </ul>

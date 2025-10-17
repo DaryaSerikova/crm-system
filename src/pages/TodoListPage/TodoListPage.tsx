@@ -17,7 +17,7 @@ const TodoListPage = () => {
 
   const fetchAndSetTodos = useCallback(async (listFilter: Filter) => {
     console.log('fetchAndSetTodos | listFilter: ', listFilter)
-    return getAllTodos(listFilter)
+    return await getAllTodos(listFilter)
       .then((allTodos: MetaResponse<Todo, TodoInfo>) => {
         setTodos(allTodos.data);
         if (allTodos.info) {//if из-за ts и MetaResponse, info? - поэтому мб undefined
@@ -39,9 +39,9 @@ const TodoListPage = () => {
   }, []);
 
   useEffect(() => {
-    if (todos !== null) {
+    // if (todos !== null) {
       fetchAndSetTodos(listFilter);
-    }
+    // }
   }, [listFilter]);
 
 
@@ -59,6 +59,7 @@ const TodoListPage = () => {
         { todos && <TodoList 
             todos={todos} 
             onUpdate={() => fetchAndSetTodos(listFilter)}
+            listFilter={listFilter}
           />}
       </div>
     </div>
