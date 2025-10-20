@@ -53,7 +53,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
       }
     }
     await onUpdate();
-
   }
 
   const onClickEdit = () => {
@@ -68,20 +67,22 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     e.preventDefault();
     const validationMessage = getValidationMessage(editTitle);
 
-    if (validationMessage === null) {
-      setEditError(null);
-      try {
-        await editTodo(id, {isDone: isDone, title: editTitle});
-        
-      } catch (err) {
-        if (err instanceof Error) {
-          alert(`${err.message}`)
-        }
-      }
-      setIsEdit(false);
-      await onUpdate();
+    if (validationMessage !== null) {
+      setEditError(validationMessage);
+      return;
+    }
 
-    } else setEditError(validationMessage);
+    setEditError(null);
+    try {
+      await editTodo(id, {isDone: isDone, title: editTitle});
+      
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(`${err.message}`)
+      }
+    }
+    setIsEdit(false);
+    await onUpdate();
   }
 
 

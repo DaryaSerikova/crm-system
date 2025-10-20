@@ -16,7 +16,6 @@ const TodoListPage = () => {
 
 
   const fetchAndSetTodos = useCallback(async (listFilter: Filter) => {
-    console.log('fetchAndSetTodos | listFilter: ', listFilter)
     return await getAllTodos(listFilter)
       .then((allTodos: MetaResponse<Todo, TodoInfo>) => {
         setTodos(allTodos.data);

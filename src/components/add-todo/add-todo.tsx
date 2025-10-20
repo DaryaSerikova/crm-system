@@ -8,42 +8,41 @@ import s from './add-todo.module.scss';
 
 
 interface AddTodoProps {
-  // listFilter: Filter,
-  // onUpdate: (listFilter: Filter) => Promise<void>,
   onUpdate: () => Promise<void>,
 }
 
-const AddTodo = ({ onUpdate, 
-  // listFilter 
-}: AddTodoProps) => {
+const AddTodo = ({ onUpdate }: AddTodoProps) => {
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
 
-  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => { //handleForm
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const validationMessage: string | null = getValidationMessage(title); //titleValue
+    const validationMessage: string | null = getValidationMessage(title);
 
-    if (validationMessage === null) {
-      setError(null);
-
-      const todo: TodoRequest = {
-        isDone: false,
-        title: title //titleValue
-      }
-
-      try {
-        await createTodo(todo);
-      } catch (err) {
-        if (err instanceof Error) {
-          alert(`${err.message}`)
-        }
-      }
-      // await onUpdate(listFilter);
-      await onUpdate();
-
-      setTitle('');
+    if (validationMessage !== null) {
+      setError(validationMessage);
+      return;
     }
-    else setError(validationMessage);
+
+    
+    setError(null);
+
+    const todo: TodoRequest = {
+      isDone: false,
+      title: title
+    }
+
+    try {
+      await createTodo(todo);
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(`${err.message}`)
+      }
+    }
+    await onUpdate();
+
+    setTitle('');
+
 
   }
 

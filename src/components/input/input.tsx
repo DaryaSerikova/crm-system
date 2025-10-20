@@ -11,8 +11,6 @@ interface InputProps {
 const Input = (props: InputProps) => {
   const {error, name, value, onChange} = props;
 
-  // const [taskTitle, setTaskTitle] = useState<string>('');
-
   return (
     <div className={s.inputWrapper} >
       <input 

@@ -34,14 +34,13 @@ const TodoFilters = ({ setListFilter, listsInfo }: FiltersProps) => {
 
   return (
     <div className={s.filters}>
-      {filtersArray.map((item: FiltersValueLabel) => 
+      {filtersArray.map((valueLabel: FiltersValueLabel) => //valueLabel
         <div 
-          className={`${s.tab} ${currentValue === item.value ? s.isActive : ''}`} 
-          key={item.value}
-          onClick={() => handleClick(item.value)}
+          className={`${s.tab} ${currentValue === valueLabel.value ? s.isActive : ''}`} 
+          key={valueLabel.value}
+          onClick={() => handleClick(valueLabel.value)}
         >
-          {item.label} ({listsInfo?.[`${item.value}`]})
-          {/* количество задач не меняется в завершенных и в работе, если сделать toggle/delete/add */}
+          {valueLabel.label} ({listsInfo?.[`${valueLabel.value}`]})
         </div>
         )}
     </div>
