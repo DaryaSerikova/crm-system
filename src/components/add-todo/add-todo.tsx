@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Input from '../input/input';
-import Button from '../button/button';
+import Input from '../ui/input/input';
+import Button from '../ui/button/button';
 import type { TodoRequest } from '../../types/types';
 import { createTodo } from '../../api/api';
 import { getValidationMessage } from '../../utils/utils';
@@ -24,7 +24,7 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
       return;
     }
 
-    
+
     setError(null);
 
     const todo: TodoRequest = {

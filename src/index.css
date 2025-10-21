@@ -3,10 +3,7 @@
 }
 
 :root {
-  /* display: flex;
-  width: 100%; */
   box-sizing: border-box;
-
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
@@ -37,9 +34,3 @@ body, html {
   min-height: 100vh;
 
 }
-
-/* 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-} */

@@ -5,21 +5,21 @@ export interface Todo { //IFullTodo
 	isDone: boolean; 
 }
 
-export interface TodoRequest { //ITodo
+export interface TodoRequest {
 	title?: string;
  	isDone?: boolean;  
 }// или так type TodoRequest = Partial<Omit<Todo, "id" | "created">>; 
 
-export interface TodoInfo { //type TListsInfo = TodoInfo | null мб проблемы на эту тему
+export interface TodoInfo { 
 	all: number;
 	completed: number;
 	inWork: number;
 }
 
-export type Filter = "all" | "completed" | "inWork"; //TFilter
+export type Filter = "all" | "completed" | "inWork";
 
 
-export interface MetaResponse<T, N> { //<Todo, TFilter>
+export interface MetaResponse<T, N> {
 	data: T[];
 	info?: N;
 	meta: {

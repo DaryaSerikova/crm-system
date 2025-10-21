@@ -18,7 +18,7 @@ export const getAllTodos = async (filter: Filter): Promise<MetaResponse<Todo, To
     return data;
   } catch (err) {
     if (err instanceof Error) {
-      throw new Error(`Failed to get all todos: ${err.message}`) //типизировать err
+      throw new Error(`Failed to get all todos: ${err.message}`);
     }
     throw err; //потому что иначе функция считает, что в catch может не быт возврата
   }
@@ -73,7 +73,7 @@ export const editTodo = async (id: number, todo: TodoRequest): Promise<{editedTo
   }
 }
 
-export const deleteTodo = async (id: number): Promise<undefined> => { //типизировать возврат функции
+export const deleteTodo = async (id: number): Promise<undefined> => {
   try {
     const response = await fetch(`${baseUrl}/todos/${id}`, {
       method: 'DELETE',
@@ -86,8 +86,6 @@ export const deleteTodo = async (id: number): Promise<undefined> => { //типи
     if(!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    // return response;
-
   } catch (err: unknown) {
     if (err instanceof Error) {
       throw new Error(`Failed to delete todo: ${err.message}`)
