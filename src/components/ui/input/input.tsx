@@ -1,4 +1,4 @@
-import s from './input.module.scss';
+import s from './Input.module.scss';
 
 
 interface InputProps {

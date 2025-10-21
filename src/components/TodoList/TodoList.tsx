@@ -1,6 +1,6 @@
-import TodoItem from '../todo-item/todo-item';
+import TodoItem from '../TodoItem/TodoItem';
 import type { Filter, Todo } from '../../types/types';
-import s from './todo-list.module.scss';
+import s from './TodoList.module.scss';
 
 
 

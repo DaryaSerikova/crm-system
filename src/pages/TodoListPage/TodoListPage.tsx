@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import AddTodo from '../../components/add-todo/add-todo';
-import TodoFilters from '../../components/todo-filters/todo-filters';
-import TodoList from '../../components/todo-list/todo-list';
+import AddTodo from '../../components/AddTodo/AddTodo';
+import TodoFilters from '../../components/TodoFilters/TodoFilters';
+import TodoList from '../../components/TodoList/TodoList';
 import type { Todo, Filter, TodoInfo, MetaResponse } from '../../types/types';
 import { getAllTodos } from '../../api/api';
 import s from './TodoListPage.module.scss';

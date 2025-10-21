@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { Todo, Filter } from '../../types/types';
-import Button from '@/components/ui/button/button';
-import Input from '@/components/ui/input/input';
+import Button from '@/components/ui/Button/Button';
+import Input from '@/components/ui/Input/Input';
 
 import { deleteTodo, editTodo } from '../../api/api';
 import { getValidationMessage } from '../../utils/utils';
-import s from './todo-item.module.scss'
+import s from './TodoItem.module.scss'
 
 
 

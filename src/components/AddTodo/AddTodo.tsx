@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import Input from '../ui/input/input';
-import Button from '../ui/button/button';
+import Input from '../ui/Input/Input';
+import Button from '../ui/Button/Button';
 import type { TodoRequest } from '../../types/types';
 import { createTodo } from '../../api/api';
 import { getValidationMessage } from '../../utils/utils';
-import s from './add-todo.module.scss';
+import s from './AddTodo.module.scss';
 
 
 interface AddTodoProps {
@@ -27,13 +27,13 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
 
     setError(null);
 
-    const todo: TodoRequest = {
+    const todoRequest: TodoRequest = {
       isDone: false,
       title: title
     }
 
     try {
-      await createTodo(todo);
+      await createTodo(todoRequest);
     } catch (err) {
       if (err instanceof Error) {
         alert(`${err.message}`)
@@ -42,8 +42,6 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
     await onUpdate();
 
     setTitle('');
-
-
   }
 
 
