@@ -15,9 +15,10 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
   
+
   const createTodoAndShowError = async () => {
     setError(null);
-
+    
     const todoRequest: TodoRequest = {
       isDone: false,
       title: title

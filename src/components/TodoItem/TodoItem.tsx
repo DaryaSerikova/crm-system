@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Todo, Filter } from '../../types/types';
+import type { Todo, Filter, TodoRequest } from '../../types/types';
 import Button from '@/components/ui/Button/Button';
 import Input from '@/components/ui/Input/Input';
 
@@ -65,7 +65,25 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     setEditTitle(e.target.value);
   }
 
-  const handleEditForm = async (e: React.FormEvent<HTMLFormElement>) => { 
+  const editTodoAndShowError = async () => {
+    setEditError(null);
+
+    const todoRequest: TodoRequest = {
+      isDone: isDone,
+      title: editTitle
+    }
+
+    try {
+      await editTodo(id, todoRequest);
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(`${err.message}`)
+      }
+    }
+    setIsEdit(false);
+  }
+
+  const handleEditForm = async (e: React.FormEvent<HTMLFormElement>) => {  //мб имя как в add-todo?
     e.preventDefault();
     const validationMessage = getValidationMessage(editTitle);
 
@@ -74,16 +92,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
       return;
     }
 
-    setEditError(null);
-    try {
-      await editTodo(id, {isDone: isDone, title: editTitle});
-      
-    } catch (err) {
-      if (err instanceof Error) {
-        alert(`${err.message}`)
-      }
-    }
-    setIsEdit(false);
+    await editTodoAndShowError();
     await onUpdate();
   }
 
