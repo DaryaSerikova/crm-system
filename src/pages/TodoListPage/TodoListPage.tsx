@@ -12,7 +12,7 @@ const TodoListPage = () => {
 
   const [todos, setTodos] = useState<Todo[] | null>(null);
   const [listFilter, setListFilter] = useState<Filter>("all");
-  const [listsInfo, setListsInfo] = useState<TodoInfo | null>(null);
+  const [todoInfo, setTodoInfo] = useState<TodoInfo | null>(null); //listsInfo, setListsInfo //todoInfo
 
 
   const fetchAndSetTodos = useCallback(async (listFilter: Filter) => {
@@ -20,7 +20,7 @@ const TodoListPage = () => {
       .then((allTodos: MetaResponse<Todo, TodoInfo>) => {
         setTodos(allTodos.data);
         if (allTodos.info) {//if из-за ts и MetaResponse, info? - поэтому мб undefined
-          setListsInfo(allTodos.info); 
+          setTodoInfo(allTodos.info); 
         }
       }).catch((err) => {
         if (err instanceof Error) {
@@ -53,7 +53,7 @@ const TodoListPage = () => {
 
         <TodoFilters 
           setListFilter={setListFilter}
-          listsInfo={listsInfo}
+          todoInfo={todoInfo}
         />
         { todos && <TodoList 
             todos={todos} 

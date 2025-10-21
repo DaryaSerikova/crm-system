@@ -8,42 +8,41 @@ import s from './TodoFilters.module.scss'
 
 interface FiltersProps {
   setListFilter: Dispatch<SetStateAction<Filter>>,
-  listsInfo: TodoInfo | null,
+  todoInfo: TodoInfo | null,
 }
 
-interface FiltersValueLabel {
+interface FilterStatusLabel { //FiltersValueLabel //TodoStatusLabel //FilterStatusLabel
   value: Filter,
   label: string,
 }
 
-const TodoFilters = ({ setListFilter, listsInfo }: FiltersProps) => {
+const TodoFilters = ({ setListFilter, todoInfo }: FiltersProps) => {
   const [currentValue, setCurrentValue] = useState<Filter>('all');
 
-
-  const filtersArray: FiltersValueLabel[] = [
+  const filterStatuses: FilterStatusLabel[] = [ //statusFilters: TodoStatusLabel //filtersArray: FiltersValueLabel[]
     {value: 'all', label: 'Все'},
     {value: 'inWork', label: 'В прогрессе'},
     {value: 'completed', label: 'Завершенные'},
   ];
 
-  const handleClick = (filterValue: Filter) => {
+  const handleFilterSelect = (filterValue: Filter) => { //handleClick
     setListFilter(filterValue);
     setCurrentValue(filterValue);
   }
 
 
   return (
-    <div className={s.filters}>
-      {filtersArray.map((valueLabel: FiltersValueLabel) => //valueLabel
+    <nav className={s.filters}>
+      {filterStatuses.map((filterStatus: FilterStatusLabel) => //valueLabel //todoStatus
         <div 
-          className={`${s.tab} ${currentValue === valueLabel.value ? s.isActive : ''}`} 
-          key={valueLabel.value}
-          onClick={() => handleClick(valueLabel.value)}
+          className={`${s.tab} ${currentValue === filterStatus.value ? s.isActive : ''}`} 
+          key={filterStatus.value}
+          onClick={() => handleFilterSelect(filterStatus.value)}
         >
-          {valueLabel.label} ({listsInfo?.[`${valueLabel.value}`]})
+          {filterStatus.label} ({todoInfo?.[`${filterStatus.value}`]})
         </div>
         )}
-    </div>
+    </nav>
   )
 }
 

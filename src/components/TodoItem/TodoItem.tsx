@@ -99,8 +99,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
 
   return (
     <li className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
-      {isEdit ? <>
-        <form className={s.editForm} onSubmit={handleEditForm}>
+      {isEdit ? <form className={s.editForm} onSubmit={handleEditForm}>
           <div className={s.editTodo}>
             <input 
               type="checkbox" 
@@ -122,7 +121,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
             </Button>
           </div>
         </form>
-        </> 
         : <>
           <div className={s.todo}>
             <input 
