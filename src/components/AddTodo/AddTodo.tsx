@@ -14,17 +14,8 @@ interface AddTodoProps {
 const AddTodo = ({ onUpdate }: AddTodoProps) => {
   const [title, setTitle] = useState<string>('');
   const [error, setError] = useState<string|null>(null);
-
-  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const validationMessage: string | null = getValidationMessage(title);
-
-    if (validationMessage !== null) {
-      setError(validationMessage);
-      return;
-    }
-
-
+  
+  const createTodoAndShowError = async () => {
     setError(null);
 
     const todoRequest: TodoRequest = {
@@ -39,6 +30,18 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
         alert(`${err.message}`)
       }
     }
+  }
+
+  const handleSubmitTodo = async (e: React.FormEvent<HTMLFormElement>) => { //handleSubmitForm
+    e.preventDefault();
+    const validationMessage: string | null = getValidationMessage(title);
+
+    if (validationMessage !== null) {
+      setError(validationMessage);
+      return;
+    }
+
+    await createTodoAndShowError();
     await onUpdate();
 
     setTitle('');
@@ -48,7 +51,7 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
   return (
     <form 
       className={s.form}
-      onSubmit={handleSubmitForm} 
+      onSubmit={handleSubmitTodo} 
       >
       <Input 
         error={error}
