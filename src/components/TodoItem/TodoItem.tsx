@@ -46,7 +46,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     await onUpdate();
   }
 
-  const handleToggle = async () => {//toggle чего название
+  const handleToggle = async () => {
     try {
       await editTodo(id, {title: title, isDone: !isDone});
     } catch (err) {

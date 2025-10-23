@@ -1,8 +1,4 @@
 export const getValidationMessage = (str: string): string | null => { 
-  //Быстрый выход, Return Early Pattern
-  //Антипатерн магические числа
-  //можно вернуть '' и сузить типизацию до string
-
   const MIN_CHARACTERS_NUMBER = 2;
   const MAX_CHARACTERS_NUMBER = 64;
 

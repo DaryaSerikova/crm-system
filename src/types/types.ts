@@ -8,7 +8,7 @@ export interface Todo {
 export interface TodoRequest {
 	title?: string;
  	isDone?: boolean;  
-}// или так type TodoRequest = Partial<Omit<Todo, "id" | "created">>; 
+}
 
 export interface TodoInfo { 
 	all: number;

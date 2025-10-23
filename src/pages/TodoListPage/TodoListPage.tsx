@@ -12,14 +12,14 @@ const TodoListPage = () => {
 
   const [todos, setTodos] = useState<Todo[] | null>(null);
   const [listFilter, setListFilter] = useState<Filter>("all");
-  const [todoInfo, setTodoInfo] = useState<TodoInfo | null>(null); //listsInfo, setListsInfo
+  const [todoInfo, setTodoInfo] = useState<TodoInfo | null>(null);
 
 
   const fetchAndSetTodos = useCallback(async (listFilter: Filter) => {
     return await getAllTodos(listFilter)
       .then((allTodos: MetaResponse<Todo, TodoInfo>) => {
         setTodos(allTodos.data);
-        if (allTodos.info) {//if из-за ts и MetaResponse, info? - поэтому мб undefined
+        if (allTodos.info) {
           setTodoInfo(allTodos.info); 
         }
       }).catch((err) => {
@@ -31,16 +31,16 @@ const TodoListPage = () => {
           `);
         }
       })
-  }, []);//создается один раз
+  }, []);
 
   useEffect(() => {
     fetchAndSetTodos(listFilter);
   }, []);
 
   useEffect(() => {
-    // if (todos !== null) {
+    if (todos !== null) {
       fetchAndSetTodos(listFilter);
-    // }
+    }
   }, [listFilter]);
 
 
