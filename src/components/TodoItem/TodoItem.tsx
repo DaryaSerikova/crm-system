@@ -65,25 +65,8 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     setEditTitle(e.target.value);
   }
 
-  const editTodoAndShowError = async () => {
-    setEditError(null);
 
-    const todoRequest: TodoRequest = {
-      isDone: isDone,
-      title: editTitle
-    }
-
-    try {
-      await editTodo(id, todoRequest);
-    } catch (err) {
-      if (err instanceof Error) {
-        alert(`${err.message}`)
-      }
-    }
-    setIsEdit(false);
-  }
-
-  const handleEditForm = async (e: React.FormEvent<HTMLFormElement>) => {  //мб имя как в add-todo?
+  const handleSubmitEditedTodo = async (e: React.FormEvent<HTMLFormElement>) => {  //handleEditForm
     e.preventDefault();
     const validationMessage = getValidationMessage(editTitle);
 
@@ -91,15 +74,29 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
       setEditError(validationMessage);
       return;
     }
+    setEditError(null);
 
-    await editTodoAndShowError();
-    await onUpdate();
+    try {
+      const todoRequest: TodoRequest = {
+        isDone: isDone,
+        title: editTitle
+      }
+
+      await editTodo(id, todoRequest);
+      setIsEdit(false);
+      await onUpdate();
+
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(`${err.message}`)
+      }
+    }
   }
 
 
   return (
     <li className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
-      {isEdit ? <form className={s.editForm} onSubmit={handleEditForm}>
+      {isEdit ? <form className={s.editForm} onSubmit={handleSubmitEditedTodo}>
           <div className={s.editTodo}>
             <input 
               type="checkbox" 

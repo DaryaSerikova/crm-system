@@ -12,7 +12,7 @@ const TodoListPage = () => {
 
   const [todos, setTodos] = useState<Todo[] | null>(null);
   const [listFilter, setListFilter] = useState<Filter>("all");
-  const [todoInfo, setTodoInfo] = useState<TodoInfo | null>(null); //listsInfo, setListsInfo //todoInfo
+  const [todoInfo, setTodoInfo] = useState<TodoInfo | null>(null); //listsInfo, setListsInfo
 
 
   const fetchAndSetTodos = useCallback(async (listFilter: Filter) => {
