@@ -20,7 +20,7 @@ export const getAllTodos = async (filter: Filter): Promise<MetaResponse<Todo, To
     if (err instanceof Error) {
       throw new Error(`Failed to get all todos: ${err.message}`);
     }
-    throw err; //потому что иначе функция считает, что в catch может не быт возврата
+    throw err;
   }
 }
 
@@ -81,7 +81,6 @@ export const deleteTodo = async (id: number): Promise<undefined> => {
         'Content-Type': 'application/json',
       },   
     });
-    console.log('response: ', response)
 
     if(!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)

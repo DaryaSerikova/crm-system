@@ -19,7 +19,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
 
   const { id, title, isDone } = todo;
   const [ isEdit, setIsEdit] = useState<boolean>(false);
-  const [editTitle, setEditTitle] = useState<string>(title); //null
+  const [editTitle, setEditTitle] = useState<string>(title);
   const [ editError, setEditError ] = useState<string | null>(null);
 
   const handleCancel = () => {
@@ -61,12 +61,12 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     setIsEdit(true);
   }
 
-  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {//handleEdit
+  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditTitle(e.target.value);
   }
 
 
-  const handleSubmitEditedTodo = async (e: React.FormEvent<HTMLFormElement>) => {  //handleEditForm
+  const handleSubmitEditedTodo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationMessage = getValidationMessage(editTitle);
 

@@ -11,7 +11,7 @@ interface FiltersProps {
   todoInfo: TodoInfo | null,
 }
 
-interface FilterStatusLabel { //FiltersValueLabel 
+interface FilterStatusLabel {
   value: Filter,
   label: string,
 }
@@ -19,13 +19,13 @@ interface FilterStatusLabel { //FiltersValueLabel
 const TodoFilters = ({ setListFilter, todoInfo }: FiltersProps) => {
   const [currentValue, setCurrentValue] = useState<Filter>('all');
 
-  const filterStatuses: FilterStatusLabel[] = [ //filtersArray: FiltersValueLabel[]
+  const filterStatuses: FilterStatusLabel[] = [
     {value: 'all', label: 'Все'},
     {value: 'inWork', label: 'В прогрессе'},
     {value: 'completed', label: 'Завершенные'},
   ];
 
-  const handleFilterSelect = (filterValue: Filter) => { //handleClick
+  const handleFilterSelect = (filterValue: Filter) => {
     setListFilter(filterValue);
     setCurrentValue(filterValue);
   }
@@ -33,7 +33,7 @@ const TodoFilters = ({ setListFilter, todoInfo }: FiltersProps) => {
 
   return (
     <nav className={s.filters}>
-      {filterStatuses.map((filterStatus: FilterStatusLabel) => //valueLabel
+      {filterStatuses.map((filterStatus: FilterStatusLabel) =>
         <div 
           className={`${s.tab} ${currentValue === filterStatus.value ? s.isActive : ''}`} 
           key={filterStatus.value}

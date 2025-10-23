@@ -16,7 +16,7 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
   const [error, setError] = useState<string|null>(null);
   
 
-  const handleSubmitTodo = async (e: React.FormEvent<HTMLFormElement>) => { //handleSubmitForm
+  const handleSubmitTodo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationMessage: string | null = getValidationMessage(title);
 
@@ -35,7 +35,7 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
       await createTodo(todoRequest);
       await onUpdate();
       setTitle('');
-      
+
     } catch (err) {
       if (err instanceof Error) {
         alert(`${err.message}`)
