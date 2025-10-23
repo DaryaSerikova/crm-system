@@ -28,7 +28,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     setIsEdit(false);
   };
 
-  useEffect(() => { //чтобы при смене вкладки сбрасывалось редактирование (React 19)
+  useEffect(() => { 
     if (isEdit === true) {
       handleCancel();
     }
