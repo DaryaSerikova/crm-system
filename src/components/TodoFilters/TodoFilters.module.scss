@@ -1,0 +1,12 @@
+.filters {
+  display: flex;
+  flex-direction: row;
+  gap:15px;
+
+  .tab {
+    color: gray;
+  }
+  .isActive {
+    text-decoration: underline;
+  }
+}
