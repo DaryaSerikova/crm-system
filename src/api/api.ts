@@ -26,13 +26,14 @@ export const getAllTodos = async (filter: Filter): Promise<MetaResponse<Todo, To
 
 export const createTodo = async (todo: TodoRequest): Promise<Todo> => {
   try {
-    const response = await fetch(`${baseUrl}/todos`, {
-      method: 'POST',
-      body: JSON.stringify(todo),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    // const response = await fetch(`${baseUrl}/todos`, {
+    //   method: 'POST',
+    //   body: JSON.stringify(todo),
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   }
+    // });
+    const response = undefined;
 
     if(!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)

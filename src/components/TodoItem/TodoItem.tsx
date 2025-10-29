@@ -68,9 +68,12 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
 
   const handleSubmitEditedTodo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const validationMessage = getValidationMessage(editTitle);
+    // const validationMessage = getValidationMessage(editTitle);
+    const validationMessage: string = getValidationMessage(editTitle);
 
-    if (validationMessage !== null) {
+
+    // if (validationMessage !== null) {
+    if (validationMessage !== '') {
       setEditError(validationMessage);
       return;
     }

@@ -85,3 +85,6 @@ npm i react-router
 
 npm i sass
 
+
+npm install antd --save
+

@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import Input from '../ui/Input/Input';
-import Button from '../ui/Button/Button';
 import type { TodoRequest } from '../../types/types';
 import { createTodo } from '../../api/api';
-import { getValidationMessage } from '../../utils/utils';
+import { getValidationMessage, getValidationMessageAntd } from '../../utils/utils';
 import s from './AddTodo.module.scss';
+
+import type { FormProps } from 'antd';
+import { Button, Form, Input } from 'antd';
+import { useForm } from 'antd/es/form/Form';
+
 
 
 interface AddTodoProps {
@@ -12,51 +14,115 @@ interface AddTodoProps {
 }
 
 const AddTodo = ({ onUpdate }: AddTodoProps) => {
-  const [title, setTitle] = useState<string>('');
-  const [error, setError] = useState<string|null>(null);
+  const { Item } = Form;
+  const [ form ] = useForm();
+
+  type FieldType = {
+    title?: string;
+  };
   
+  
+  const onFinish: FormProps<FieldType>['onFinish'] = async(values) => {
+    console.log('Success:', values);
 
-  const handleSubmitTodo = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const validationMessage: string | null = getValidationMessage(title);
+    const validationMessage: string = getValidationMessage(values.title); //values.title: string | undefined
 
-    if (validationMessage !== null) {
-      setError(validationMessage);
+    if (validationMessage !== '') {
       return;
     }
-    setError(null);
 
     try {
       const todoRequest: TodoRequest = {
         isDone: false,
-        title: title
+        title: values.title,
       }
   
       await createTodo(todoRequest);
       await onUpdate();
-      setTitle('');
+
+      form.resetFields(); 
 
     } catch (err) {
       if (err instanceof Error) {
         alert(`${err.message}`)
       }
     }
-  }
+
+  };
+  
+  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.log('onFinishFailed Failed:', errorInfo);
+  };
+  
+
+  // const handleSubmitTodo = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   // const validationMessage: string | null = getValidationMessage(title);
+  //   const validationMessage: string = getValidationMessage(title);
+
+
+  //   // if (validationMessage !== null) {
+  //   if (validationMessage !== '') {
+
+  //     setError(validationMessage);
+  //     return;
+  //   }
+  //   setError(null);
+
+  //   try {
+  //     const todoRequest: TodoRequest = {
+  //       isDone: false,
+  //       title: title
+  //     }
+  
+  //     await createTodo(todoRequest);
+  //     await onUpdate();
+  //     setTitle('');
+
+  //   } catch (err) {
+  //     if (err instanceof Error) {
+  //       alert(`${err.message}`)
+  //     }
+  //   }
+  // }
 
 
   return (
-    <form 
-      className={s.form}
-      onSubmit={handleSubmitTodo} 
+    // <form 
+    //   className={s.form}
+    //   onSubmit={handleSubmitTodo} 
+    //   >
+    //   <Input 
+    //     // error={error}
+    //     // name='title'
+    //     value={title}
+    //     onChange={(e) => {setTitle(e.target.value)}} 
+    //   />
+    //   <Button type="submit">Add</Button>
+    // </form>
+
+
+    <Form
+        form={form}
+        name="add-todo"
+        // initialValues={{ remember: true }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
       >
-      <Input 
-        error={error}
-        name='title'
-        value={title}
-        onChange={(e) => {setTitle(e.target.value)}} 
-      />
-      <Button type="submit">Add</Button>
-    </form>
+      <Item<FieldType>
+        label=""
+        name="title"
+        rules={[{ validator: (_, value) => getValidationMessageAntd(value) }]}
+      >
+        <Input />
+      </Item>
+
+    <Item label={null}>
+      <Button type="primary" htmlType="submit">
+        Add
+      </Button>
+    </Item>
+    </Form>
   )
 }
 
