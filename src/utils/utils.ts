@@ -13,23 +13,19 @@ export const getValidationMessage = (str: string): string => {
   if (str.length > MAX_CHARACTERS_NUMBER ) {
     return "Cимволов не может быть более 64";
   }
-
+  
   // return null;
   return '';
 }
 
 
-export const getValidationMessageAntd = (value: string): Promise => {  // промисс string или без аргумента
-  // // export const getValidationMessageAntd = (str: string): Promise<string> => { 
-  
+export const getValidationMessageAntd = (value: string): Promise<void> => {  // промисс string или без аргумента
+
   const validationMessage = getValidationMessage(value);
 
   if (validationMessage !== '') {
+  // if (validationMessage) {
     return Promise.reject(new Error(validationMessage));
   }
-  return Promise.resolve();
-  
-//     // return null;
-//     // return Promise.resolve('');
-//     return Promise.resolve(); // здесь нет аргумента в промисе
+  return Promise.resolve(); // здесь нет аргумента в промисе
   }

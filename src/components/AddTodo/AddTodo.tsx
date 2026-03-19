@@ -1,11 +1,9 @@
 import type { TodoRequest } from '../../types/types';
-import { createTodo } from '../../api/api';
-import { getValidationMessage, getValidationMessageAntd } from '../../utils/utils';
-import s from './AddTodo.module.scss';
-
-import type { FormProps } from 'antd';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Flex } from 'antd';
 import { useForm } from 'antd/es/form/Form';
+import type { FormProps } from 'antd';
+import { createTodo } from '../../api/api';
+import { getValidationMessageAntd } from '../../utils/utils';
 
 
 
@@ -23,14 +21,6 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
   
   
   const onFinish: FormProps<FieldType>['onFinish'] = async(values) => {
-    console.log('Success:', values);
-
-    const validationMessage: string = getValidationMessage(values.title); //values.title: string | undefined
-
-    if (validationMessage !== '') {
-      return;
-    }
-
     try {
       const todoRequest: TodoRequest = {
         isDone: false,
@@ -47,7 +37,6 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
         alert(`${err.message}`)
       }
     }
-
   };
   
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
@@ -103,25 +92,28 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
 
 
     <Form
-        form={form}
-        name="add-todo"
-        // initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-      >
-      <Item<FieldType>
-        label=""
-        name="title"
-        rules={[{ validator: (_, value) => getValidationMessageAntd(value) }]}
-      >
-        <Input />
-      </Item>
+      form={form}
+      name="add-todo"
+      onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
+    >
+      <Flex gap={10} align="center">
+        <Item<FieldType>
+          label=""
+          name="title"
+          rules={[{ validator: (_, value) => getValidationMessageAntd(value) }]}
+          style={{ flex: 1 }}
+        >
+          <Input />
+        </Item>
 
-    <Item label={null}>
-      <Button type="primary" htmlType="submit">
-        Add
-      </Button>
-    </Item>
+        <Item label={null} >
+          <Button type="primary" htmlType="submit">
+            Add
+          </Button>
+        </Item>
+      </Flex>
+
     </Form>
   )
 }

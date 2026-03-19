@@ -25,9 +25,9 @@ const TodoListPage = () => {
       }).catch((err) => {
         if (err instanceof Error) {
           alert(`
-            NAME: ${err.name}, 
-            MESSAGE: ${err.message}, 
-            STACK: ${err.stack}
+            NAME: ${err?.name}, 
+            MESSAGE: ${err?.message}, 
+            STACK: ${err?.stack}
           `);
         }
       })
@@ -37,10 +37,26 @@ const TodoListPage = () => {
     fetchAndSetTodos(listFilter);
   }, []);
 
+  // useEffect(() => {
+  //   if (todos !== null) {
+  //     fetchAndSetTodos(listFilter);
+  //   }
+  // }, [listFilter]);
+
   useEffect(() => {
-    if (todos !== null) {
-      fetchAndSetTodos(listFilter);
-    }
+    let timerId: ReturnType<typeof setTimeout>;
+  
+    const autoFetch = async () => {
+      await fetchAndSetTodos(listFilter);
+      timerId = setTimeout(autoFetch, 5000);
+    };
+  
+    autoFetch();
+  
+    // Очистка при уходе со страницы/изменении фильтра
+    return () => {
+      if (timerId) clearTimeout(timerId);
+    };
   }, [listFilter]);
 
 
