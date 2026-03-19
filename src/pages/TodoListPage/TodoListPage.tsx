@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { Todo, Filter, TodoInfo, MetaResponse } from '../../types/types';
 import AddTodo from '../../components/AddTodo/AddTodo';
 import TodoFilters from '../../components/TodoFilters/TodoFilters';
 import TodoList from '../../components/TodoList/TodoList';
-import type { Todo, Filter, TodoInfo, MetaResponse } from '../../types/types';
 import { getAllTodos } from '../../api/api';
 import s from './TodoListPage.module.scss';
 
@@ -36,12 +36,6 @@ const TodoListPage = () => {
   useEffect(() => {
     fetchAndSetTodos(listFilter);
   }, []);
-
-  // useEffect(() => {
-  //   if (todos !== null) {
-  //     fetchAndSetTodos(listFilter);
-  //   }
-  // }, [listFilter]);
 
   useEffect(() => {
     let timerId: ReturnType<typeof setTimeout>;

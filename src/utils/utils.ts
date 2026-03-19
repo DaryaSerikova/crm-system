@@ -1,5 +1,4 @@
-export const getValidationMessage = (str: string): string => { 
-// export const getValidationMessage = (str: string): string | null => { 
+export const getValidationMessage = (str: string): string => {
 
   const MIN_CHARACTERS_NUMBER = 2;
   const MAX_CHARACTERS_NUMBER = 64;
@@ -13,18 +12,16 @@ export const getValidationMessage = (str: string): string => {
   if (str.length > MAX_CHARACTERS_NUMBER ) {
     return "Cимволов не может быть более 64";
   }
-  
-  // return null;
+
   return '';
 }
 
 
-export const getValidationMessageAntd = (value: string): Promise<void> => {  // промисс string или без аргумента
+export const getValidationMessageAntd = (value: string): Promise<void> => {
 
   const validationMessage = getValidationMessage(value);
 
   if (validationMessage !== '') {
-  // if (validationMessage) {
     return Promise.reject(new Error(validationMessage));
   }
   return Promise.resolve(); // здесь нет аргумента в промисе

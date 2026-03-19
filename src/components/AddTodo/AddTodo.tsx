@@ -43,54 +43,7 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
     console.log('onFinishFailed Failed:', errorInfo);
   };
   
-
-  // const handleSubmitTodo = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   // const validationMessage: string | null = getValidationMessage(title);
-  //   const validationMessage: string = getValidationMessage(title);
-
-
-  //   // if (validationMessage !== null) {
-  //   if (validationMessage !== '') {
-
-  //     setError(validationMessage);
-  //     return;
-  //   }
-  //   setError(null);
-
-  //   try {
-  //     const todoRequest: TodoRequest = {
-  //       isDone: false,
-  //       title: title
-  //     }
-  
-  //     await createTodo(todoRequest);
-  //     await onUpdate();
-  //     setTitle('');
-
-  //   } catch (err) {
-  //     if (err instanceof Error) {
-  //       alert(`${err.message}`)
-  //     }
-  //   }
-  // }
-
-
   return (
-    // <form 
-    //   className={s.form}
-    //   onSubmit={handleSubmitTodo} 
-    //   >
-    //   <Input 
-    //     // error={error}
-    //     // name='title'
-    //     value={title}
-    //     onChange={(e) => {setTitle(e.target.value)}} 
-    //   />
-    //   <Button type="submit">Add</Button>
-    // </form>
-
-
     <Form
       form={form}
       name="add-todo"

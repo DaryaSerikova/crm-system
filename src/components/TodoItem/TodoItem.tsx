@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { Todo, Filter, TodoRequest } from '../../types/types';
 import { deleteTodo, editTodo } from '../../api/api';
-import { getValidationMessage } from '../../utils/utils';
-import s from './TodoItem.module.scss'
-
-
-import type { FormProps } from 'antd';
+import { getValidationMessage, getValidationMessageAntd } from '../../utils/utils';
 import { Button, Checkbox, Form, Input, Row, Col, Space, Flex } from 'antd';
+import type { FormProps } from 'antd';
 import type { CheckboxProps } from 'antd';
-
-import { getValidationMessageAntd } from '../../utils/utils';
+import s from './TodoItem.module.scss'
 
 
 
@@ -25,7 +21,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
   const [ isEdit, setIsEdit] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState<string>(title); //нужен!!!!!! 
   const [ editIsDone, setEditIsDone ] = useState<boolean>(isDone); //добавленное
-  // const [ editError, setEditError ] = useState<string | null>(null);
 
   const { Item } = Form;
 
@@ -41,9 +36,9 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     form.setFieldsValue(initialData);
   }, [form, isDone, title]);
   
-  useEffect(() => {
-    console.log('render');
-  });
+  // useEffect(() => {
+  //   console.log('render');
+  // });
 
   const handleSubmitEditedTodo: FormProps<FieldType>['onFinish'] = async (values) => {
     console.log('Success:', values);
@@ -83,9 +78,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
   const handleCancel = () => {
     setEditTitle(title); 
     setEditIsDone(isDone);  //добавленное
-    // setEditIsDone(null);  //добавленное
-
-    // setEditError(null); //?
     setIsEdit(false);
   };
 
@@ -124,38 +116,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     setEditTitle(e.target.value);
   }
 
-
-  // const handleSubmitEditedTodo = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   // const validationMessage = getValidationMessage(editTitle);
-  //   const validationMessage: string = getValidationMessage(editTitle);
-
-
-  //   // if (validationMessage !== null) {
-  //   if (validationMessage !== '') {
-  //     setEditError(validationMessage);
-  //     return;
-  //   }
-  //   setEditError(null);
-
-  //   try {
-  //     const todoRequest: TodoRequest = {
-  //       isDone: isDone,
-  //       title: editTitle
-  //     }
-
-  //     await editTodo(id, todoRequest);
-  //     setIsEdit(false);
-  //     await onUpdate();
-
-  //   } catch (err) {
-  //     if (err instanceof Error) {
-  //       alert(`${err.message}`)
-  //     }
-  //   }
-  // }
-
-
   return (
     <li className={`${s.wrapperTodo} ${isEdit ? s.wrapperTodoEdit : ''}`}>
       {isEdit ? <Form
@@ -174,25 +134,18 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
                 label=""
                 name="isDone"
               >
-                <Checkbox 
-                  // className={s.checkbox} 
-                  onChange={onChangeEditCheckbox}
-                  // defaultChecked={isDone}
-                  // checked={editIsDone}
-                />
+                <Checkbox onChange={onChangeEditCheckbox} />
               </Item>
               <Item<FieldType>
                 label=""
                 name="title"
                 rules={[{ validator: (_, value) => getValidationMessageAntd(value) }]}
-
                 style={{ flex: 1 }}
               >
                 <Input 
                   value={editTitle}
                   onChange={onChangeInput}
                   style={{ width: '100%' }}
-                  // error={editError}
                 />
               </Item>
             </Flex>
@@ -208,8 +161,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
           </Col>
 
         </Row>
-
-        
       </Form>
 
         : <>
@@ -218,13 +169,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
               onChange={onChangeCheckbox}
               checked={isDone}
             />
-            {/* <input 
-              type="checkbox" 
-              className={s.checkbox} 
-              checked={isDone} 
-
-              onChange={() => handleToggle()}
-            /> */}
             <div className={`${s.title} ${isDone ? s.titleIsDone : ''}`}>{title}</div>
 
           </div>
