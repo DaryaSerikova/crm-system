@@ -3,6 +3,8 @@ export const getValidationMessage = (str: string): string => {
   const MIN_CHARACTERS_NUMBER = 2;
   const MAX_CHARACTERS_NUMBER = 64;
 
+  str = str.trim();
+
   if (str.length === 0) {
     return "Поле не может быть пустым!";
   }

@@ -41,7 +41,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
   // });
 
   const handleSubmitEditedTodo: FormProps<FieldType>['onFinish'] = async (values) => {
-    console.log('Success:', values);
+    console.log('submit values:', values);
 
     const validationMessage: string = getValidationMessage(editTitle);
 
@@ -79,6 +79,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     setEditTitle(title); 
     setEditIsDone(isDone);  //добавленное
     setIsEdit(false);
+    form.setFieldsValue({isDone: isDone, title: title});
   };
 
   useEffect(() => { 
@@ -110,7 +111,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     }
     await onUpdate();
   }
-
 
   const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditTitle(e.target.value);
