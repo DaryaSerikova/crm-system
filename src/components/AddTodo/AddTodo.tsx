@@ -3,7 +3,7 @@ import { Button, Form, Input, Flex } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import type { FormProps } from 'antd';
 import { createTodo } from '../../api/api';
-import { getValidationMessageAntd } from '../../utils/utils';
+import { openNotification } from '@/utils/errors';
 
 
 
@@ -19,7 +19,6 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
     title?: string;
   };
   
-  
   const onFinish: FormProps<FieldType>['onFinish'] = async(values) => {
     try {
       const todoRequest: TodoRequest = {
@@ -29,12 +28,15 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
   
       await createTodo(todoRequest);
       await onUpdate();
-
       form.resetFields(); 
 
     } catch (err) {
       if (err instanceof Error) {
-        alert(`${err.message}`)
+        openNotification({
+          type: 'error', 
+          title: 'ERROR: Add Todo', 
+          description:`${err.message}`
+        })
       }
     }
   };
@@ -54,7 +56,11 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
         <Item<FieldType>
           label=""
           name="title"
-          rules={[{ validator: (_, value) => getValidationMessageAntd(value) }]}
+          rules={[
+            { required: true, message: 'Поле не может быть пустым!!' },
+            { min: 2, message: 'Cимволов не может быть менее 2' },
+            { max: 64, message: 'Cимволов не может быть более 64' }
+          ]}
           style={{ flex: 1 }}
         >
           <Input />

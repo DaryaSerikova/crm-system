@@ -12,7 +12,7 @@ const api = axios.create({
 export const getAllTodos = async (filter: Filter): Promise<MetaResponse<Todo, TodoInfo>> => {
   try {
     const response = await api.get(`/todos`, {
-      params: {filter: `${filter}`}
+      params: {filter: filter}
     })
     return response.data;
   } catch (err) {

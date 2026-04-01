@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { Todo, Filter, TodoRequest } from '../../types/types';
 import { deleteTodo, editTodo } from '../../api/api';
-import { getValidationMessage, getValidationMessageAntd } from '../../utils/utils';
+import { getValidationMessage } from '../../utils/utils';
 import { Button, Checkbox, Form, Input, Row, Col, Space, Flex } from 'antd';
 import type { FormProps } from 'antd';
 import type { CheckboxProps } from 'antd';
 import s from './TodoItem.module.scss'
+import { openNotification } from '@/utils/errors';
 
 
 
@@ -15,6 +16,11 @@ interface TodoProps {
   onUpdate: () => Promise<void>,
 }
 
+type FieldType = {
+  isDone?: boolean;
+  title?: string;
+};
+
 const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
 
   const { id, title, isDone } = todo;
@@ -23,12 +29,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
   const [ editIsDone, setEditIsDone ] = useState<boolean>(isDone); //добавленное
 
   const { Item } = Form;
-
-  type FieldType = {
-    isDone?: boolean;
-    title?: string;
-  };
-
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -36,13 +36,9 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
     form.setFieldsValue(initialData);
   }, [form, isDone, title]);
   
-  // useEffect(() => {
-  //   console.log('render');
-  // });
 
   const handleSubmitEditedTodo: FormProps<FieldType>['onFinish'] = async (values) => {
     console.log('submit values:', values);
-
     const validationMessage: string = getValidationMessage(editTitle);
 
     if (validationMessage !== '') {
@@ -61,7 +57,11 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
 
     } catch (err) {
       if (err instanceof Error) {
-        alert(`${err.message}`)
+        openNotification({
+          type: 'error', 
+          title: 'ERROR: Edit Todo', 
+          description:`${err.message}`
+        })
       }
     }
   };
@@ -94,7 +94,11 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
       await deleteTodo(id);
     } catch (err) {
       if (err instanceof Error) {
-        alert(`${err.message}`);
+        openNotification({
+          type: 'error', 
+          title: 'ERROR: Delete Todo', 
+          description:`${err.message}`
+        })
       }
     }
     await onUpdate();
@@ -106,7 +110,12 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
       await editTodo(id, {title: title, isDone: !isDone});
     } catch (err) {
       if (err instanceof Error) {
-        alert(`${err.message}`);
+        openNotification({
+          type: 'error', 
+          title: 'ERROR: Toggle Todo (Change checkbox)', 
+          description:`${err.message}`
+        })
+
       }
     }
     await onUpdate();
@@ -139,7 +148,11 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
               <Item<FieldType>
                 label=""
                 name="title"
-                rules={[{ validator: (_, value) => getValidationMessageAntd(value) }]}
+                rules={[
+                  { required: true, message: 'Поле не может быть пустым!!' },
+                  { min: 2, message: 'Cимволов не может быть менее 2' },
+                  { max: 64, message: 'Cимволов не может быть более 64' }
+                ]}
                 style={{ flex: 1 }}
               >
                 <Input 
@@ -154,7 +167,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
           <Col flex="none">
             <Space size={10}>
               <Button htmlType='submit'>Save</Button>
-              <Button htmlType='reset' onClick={() => handleCancel()}>
+              <Button htmlType='reset' onClick={handleCancel}>
                 Cancel
               </Button>
             </Space>

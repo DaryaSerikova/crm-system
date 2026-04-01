@@ -3,6 +3,7 @@ import type { Todo, Filter, TodoInfo, MetaResponse } from '../../types/types';
 import AddTodo from '../../components/AddTodo/AddTodo';
 import TodoFilters from '../../components/TodoFilters/TodoFilters';
 import TodoList from '../../components/TodoList/TodoList';
+import { openNotification } from '@/utils/errors';
 import { getAllTodos } from '../../api/api';
 import s from './TodoListPage.module.scss';
 
@@ -24,11 +25,11 @@ const TodoListPage = () => {
         }
       }).catch((err) => {
         if (err instanceof Error) {
-          alert(`
-            NAME: ${err?.name}, 
-            MESSAGE: ${err?.message}, 
-            STACK: ${err?.stack}
-          `);
+          openNotification({
+            type: 'error', 
+            title: 'ERROR: Get All Todo', 
+            description:`${err.message}`
+          })
         }
       })
   }, []);

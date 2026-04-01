@@ -17,14 +17,3 @@ export const getValidationMessage = (str: string): string => {
 
   return '';
 }
-
-
-export const getValidationMessageAntd = (value: string): Promise<void> => {
-
-  const validationMessage = getValidationMessage(value);
-
-  if (validationMessage !== '') {
-    return Promise.reject(new Error(validationMessage));
-  }
-  return Promise.resolve(); // здесь нет аргумента в промисе
-  }
