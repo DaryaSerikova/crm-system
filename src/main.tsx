@@ -1,10 +1,19 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
+import { App as AntdApp} from 'antd';
 import App from './App.tsx'
+import './index.css'
+
+import { BrowserRouter } from "react-router";
+import GlobalAntdSetter from './utils/antdGlobal.tsx';
+
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  // <StrictMode>
+  <AntdApp>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+    <GlobalAntdSetter />
+  </AntdApp>
+  // </StrictMode>,
 )

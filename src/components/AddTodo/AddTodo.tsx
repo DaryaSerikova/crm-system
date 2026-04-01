@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import Input from '../ui/Input/Input';
-import Button from '../ui/Button/Button';
 import type { TodoRequest } from '../../types/types';
+import { Button, Form, Input, Flex } from 'antd';
+import { useForm } from 'antd/es/form/Form';
+import type { FormProps } from 'antd';
 import { createTodo } from '../../api/api';
-import { getValidationMessage } from '../../utils/utils';
-import s from './AddTodo.module.scss';
+import { openNotification } from '@/utils/errors';
+
 
 
 interface AddTodoProps {
@@ -12,51 +12,68 @@ interface AddTodoProps {
 }
 
 const AddTodo = ({ onUpdate }: AddTodoProps) => {
-  const [title, setTitle] = useState<string>('');
-  const [error, setError] = useState<string|null>(null);
+  const { Item } = Form;
+  const [ form ] = useForm();
+
+  type FieldType = {
+    title?: string;
+  };
   
-
-  const handleSubmitTodo = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const validationMessage: string | null = getValidationMessage(title);
-
-    if (validationMessage !== null) {
-      setError(validationMessage);
-      return;
-    }
-    setError(null);
-
+  const onFinish: FormProps<FieldType>['onFinish'] = async(values) => {
     try {
       const todoRequest: TodoRequest = {
         isDone: false,
-        title: title
+        title: values.title,
       }
   
       await createTodo(todoRequest);
       await onUpdate();
-      setTitle('');
+      form.resetFields(); 
 
     } catch (err) {
       if (err instanceof Error) {
-        alert(`${err.message}`)
+        openNotification({
+          type: 'error', 
+          title: 'ERROR: Add Todo', 
+          description:`${err.message}`
+        })
       }
     }
-  }
-
-
+  };
+  
+  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.log('onFinishFailed Failed:', errorInfo);
+  };
+  
   return (
-    <form 
-      className={s.form}
-      onSubmit={handleSubmitTodo} 
-      >
-      <Input 
-        error={error}
-        name='title'
-        value={title}
-        onChange={(e) => {setTitle(e.target.value)}} 
-      />
-      <Button type="submit">Add</Button>
-    </form>
+    <Form
+      form={form}
+      name="add-todo"
+      onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
+    >
+      <Flex gap={10} align="center">
+        <Item<FieldType>
+          label=""
+          name="title"
+          rules={[
+            { required: true, message: 'Поле не может быть пустым!!' },
+            { min: 2, message: 'Cимволов не может быть менее 2' },
+            { max: 64, message: 'Cимволов не может быть более 64' }
+          ]}
+          style={{ flex: 1 }}
+        >
+          <Input />
+        </Item>
+
+        <Item label={null} >
+          <Button type="primary" htmlType="submit">
+            Add
+          </Button>
+        </Item>
+      </Flex>
+
+    </Form>
   )
 }
 
