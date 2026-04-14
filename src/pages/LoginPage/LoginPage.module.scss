@@ -1,0 +1,63 @@
+//rgba(127, 38, 91, 1)
+//rgba(255, 255, 255, 1)
+// font-family: Nunito Sans;
+//rgba(222, 210, 217, 1)
+//rgba(130, 130, 130, 1)
+// color: rgba(82, 82, 82, 1);
+
+
+.login {
+  font-family: Nunito Sans;
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+
+
+  .card {
+    width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+
+  
+
+    .header {
+
+      .h1 {
+        font-weight: 700;
+        font-size: 36px;
+        color: rgba(82, 82, 82, 1);
+        margin-block-start: 0;
+        margin-block-end: 0;
+      }
+      .p {
+        font-weight: 400;
+        font-size: 16px;
+        margin-block-start: 0;
+        margin-block-end: 0;
+      }
+
+    }
+    .loginForm {
+      width: 100%;
+    
+      .customInput {}
+      .customButton {  
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+        width: 100%;
+      }
+    } 
+
+  }
+
+}

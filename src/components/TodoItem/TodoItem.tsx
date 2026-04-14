@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { Todo, Filter, TodoRequest } from '../../types/types';
-import { deleteTodo, editTodo } from '../../api/api';
-import { getValidationMessage } from '../../utils/utils';
-import { Button, Checkbox, Form, Input, Row, Col, Space, Flex } from 'antd';
 import type { FormProps } from 'antd';
 import type { CheckboxProps } from 'antd';
-import s from './TodoItem.module.scss'
+import { Button, Checkbox, Form, Input, Row, Col, Space, Flex } from 'antd';
+import { deleteTodo, editTodo } from '../../api/api';
+import { getValidationMessage } from '../../utils/utils';
 import { openNotification } from '@/utils/errors';
+import s from './TodoItem.module.scss'
 
 
 

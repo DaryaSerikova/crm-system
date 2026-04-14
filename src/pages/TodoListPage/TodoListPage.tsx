@@ -10,11 +10,9 @@ import s from './TodoListPage.module.scss';
 
 
 const TodoListPage = () => {
-
   const [todos, setTodos] = useState<Todo[] | null>(null);
   const [listFilter, setListFilter] = useState<Filter>("all");
   const [todoInfo, setTodoInfo] = useState<TodoInfo | null>(null);
-
 
   const fetchAndSetTodos = useCallback(async (listFilter: Filter) => {
     return await getAllTodos(listFilter)
