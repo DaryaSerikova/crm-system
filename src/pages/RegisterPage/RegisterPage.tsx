@@ -7,7 +7,8 @@ import { openNotification } from '@/utils/errors';
 import { registerUser } from '@/api/api';
 import s from './RegisterPage.module.scss';
 import skelet from '../../assets/images/skelet.png';
-import AuthIcon from '@/assets/icons/authIcon';
+import AuthIcon from '@/assets/icons/AuthIcon';
+
 
 
 const RegisterPage = () => {

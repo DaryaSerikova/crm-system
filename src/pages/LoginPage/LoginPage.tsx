@@ -8,7 +8,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { setAuth } from '@/store/slices/authSlice';
 import s from "./LoginPage.module.scss";
 import skelet from '../../assets/images/skelet.png';
-import AuthIcon from '@/assets/icons/authIcon';
+import AuthIcon from '@/assets/icons/AuthIcon';
 
 
 
@@ -64,7 +64,7 @@ const LoginPage = () => {
          />
       </div>
 
-      
+
       <div className={s.cardWrapper}>
         <div className={s.card}>
           <header className={s.header}>
