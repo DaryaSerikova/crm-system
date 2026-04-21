@@ -49,6 +49,18 @@ function App() {
             colorPrimaryHover: 'rgba(222, 210, 217, 1)',  // Цвет рамки при наведении
             borderRadiusSM: 4,             // Скругление самого квадратика
             colorWhite: '#fff',            // Цвет самой галочки внутри
+          },
+          Menu: {
+            itemBg: 'rgba(249, 249, 249, 1)', 
+            itemColor: 'rgba(114, 114, 114, 1)',
+
+            itemHoverBg: 'rgba(242, 242, 242, 1)',      // Фон при наведении
+            itemHoverColor: 'rgba(0, 0, 0, 1)',   // Цвет текста при наведении
+            
+            itemSelectedBg: 'rgba(242, 242, 242, 1)',     // Фон выбранного элемента
+            itemSelectedColor: 'rgba(0, 0, 0, 1)',  // Цвет текста выбранного элем
+
+            itemActiveBg: 'rgba(242, 242, 242, 1)',
           }
         },
         

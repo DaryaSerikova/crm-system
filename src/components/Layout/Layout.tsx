@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import type { MenuProps } from 'antd';
-import { Button, Menu } from 'antd';
+import { Button, Menu, Avatar } from 'antd';
+import { UserOutlined, DownOutlined } from '@ant-design/icons';
 import { Outlet, useNavigate } from 'react-router';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { removeAuth } from '@/store/slices/authSlice';
 import s from './Layout.module.scss';
+import LogoIcon from '@/assets/icons/LogoIcon';
 
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -17,6 +20,8 @@ const items: MenuItem[] = [
 const Layout = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { username } = useAppSelector(state => state?.user)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const handleMenuClick = (e: MenuInfo) => {
     navigate(e.key);
@@ -30,18 +35,34 @@ const Layout = () => {
   return (
     <>
       <div className={s.sidebar}>
-        <Menu
-          onClick={handleMenuClick}
-          defaultSelectedKeys={[window.location.pathname]}
-          defaultOpenKeys={['sub1']}
-          mode="inline"
-          items={items}
-        />
-        <Button
-          onClick={logout}
-        >
-          Logout
-        </Button>
+        <div className={s.logo}>
+          <LogoIcon />
+          <p className={s.text}>Venture</p>
+        </div>
+        <div className={s.menuWithLogout}>
+          <Menu
+            onClick={handleMenuClick}
+            defaultSelectedKeys={[window.location.pathname]}
+            defaultOpenKeys={['sub1']}
+            mode="inline"
+            items={items}
+          />
+          <div className={s.userLogout}>
+            <div className={s.user}>
+              <Avatar size={36} icon={<UserOutlined />} />
+              <p className={s.text}>{username}</p>
+              <DownOutlined onClick={() => setIsOpen(!isOpen)}/>
+            </div>
+            {isOpen ? 
+              <Button
+                onClick={logout}
+                className={s.logout}
+              >
+                Logout
+              </Button>
+              : <></>}
+          </div>
+        </div>
       </div>
       <Outlet/>
     </>
