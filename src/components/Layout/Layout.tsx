@@ -77,7 +77,7 @@ const Layout = () => {
             <div className={s.user}>
               <Avatar size={36} icon={<UserOutlined />} />
               <p className={s.text}>{userProfile?.username}</p>
-              <DownOutlined onClick={() => setIsOpen(!isOpen)}/>
+              <DownOutlined onClick={() => setIsOpen(!isOpen)} className={`${s.arrow} ${isOpen ? s.isOpen : ''}`}/>
             </div>
             {isOpen ? 
               <Button
