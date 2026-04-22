@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { MenuInfo } from 'rc-menu/lib/interface';
+import type { Profile } from '@/types/types';
 import type { MenuProps } from 'antd';
+import { Outlet, useNavigate } from 'react-router';
+import { useAppDispatch } from '@/store/hooks';
+import { removeAuth } from '@/store/slices/authSlice';
+import { setUser } from '@/store/slices/userSlice';
 import { Button, Menu, Avatar } from 'antd';
 import { UserOutlined, DownOutlined } from '@ant-design/icons';
-import { Outlet, useNavigate } from 'react-router';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { removeAuth } from '@/store/slices/authSlice';
-import s from './Layout.module.scss';
 import LogoIcon from '@/assets/icons/LogoIcon';
+import { openNotification } from '@/utils/errors';
+import { getUserProfile } from '@/api/api';
+import s from './Layout.module.scss';
 
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -18,10 +22,31 @@ const items: MenuItem[] = [
 ]
 
 const Layout = () => {
+  const [userProfile, setUserProfile] = useState<Profile | undefined>({} as Profile | undefined)
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { username } = useAppSelector(state => state?.user)
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const fetchAndSetUserProfile = async () => {
+    try {
+      const profile = await getUserProfile();
+      dispatch(setUser(profile));
+      setUserProfile(profile);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        openNotification({
+          type: 'error',
+          title: 'ERROR',
+          description: 'User Profile is failed'
+        })
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchAndSetUserProfile();
+  }, []);
 
   const handleMenuClick = (e: MenuInfo) => {
     navigate(e.key);
@@ -46,11 +71,12 @@ const Layout = () => {
             defaultOpenKeys={['sub1']}
             mode="inline"
             items={items}
+            style={{ borderRight: 'none' }} 
           />
           <div className={s.userLogout}>
             <div className={s.user}>
               <Avatar size={36} icon={<UserOutlined />} />
-              <p className={s.text}>{username}</p>
+              <p className={s.text}>{userProfile?.username}</p>
               <DownOutlined onClick={() => setIsOpen(!isOpen)}/>
             </div>
             {isOpen ? 

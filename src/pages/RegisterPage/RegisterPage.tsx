@@ -7,7 +7,6 @@ import { openNotification } from '@/utils/errors';
 import { registerUser } from '@/api/api';
 import s from './RegisterPage.module.scss';
 import skelet from '../../assets/images/skelet.png';
-import AuthIcon from '@/assets/icons/AuthIcon';
 
 
 
@@ -72,7 +71,7 @@ const RegisterPage = () => {
       <div className={s.cardWrapper}>
         <div className={s.card}>
           <header className={s.header}>
-            <AuthIcon />
+            {/* <AuthIcon /> */}
             <h1 className={s.h1}>Register to your Account</h1>
             <p className={s.p}>See what is going on with your business</p>
           </header>

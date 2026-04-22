@@ -43,9 +43,17 @@
     flex-direction: column;
     height: 100vh;
     width: 811px;
-    justify-content: center;
+    // justify-content: center;
     align-items: center;
-    gap: 317px;
+    justify-content: space-around;
+    // gap: 317px;
+    // gap: 30vh;
+
+    // @media (min-width: 1200px) {
+      // gap: 0;
+      // align-items: stretch;
+    // }
+
 
 
     .card {

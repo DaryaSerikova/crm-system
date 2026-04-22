@@ -1,41 +1,15 @@
-import { useState, useEffect } from "react";
-import type { Profile } from "@/types/types";
-import { setUser } from "@/store/slices/userSlice";
-import { useAppDispatch } from "@/store/hooks";
-import { openNotification } from "@/utils/errors";
-import { getUserProfile } from "@/api/api";
+import { useAppSelector } from "@/store/hooks";
+
 
 
 const ProfilePage = () => {
-  const [userProfile, setUserProfile] = useState<Profile | undefined>({} as Profile | undefined)
-  const dispatch = useAppDispatch();
-  
-  const fetchAndSetUserProfile = async () => {
-    try {
-      const profile = await getUserProfile();
-      dispatch(setUser(profile));
-      setUserProfile(profile);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        openNotification({
-          type: 'error',
-          title: 'ERROR',
-          description: 'User Profile is failed'
-        })
-      }
-    }
-  }
-
-  useEffect(() => {
-    fetchAndSetUserProfile();
-  },[]);
+  const { username, email, phoneNumber } = useAppSelector( state => state.user)
 
   return (
     <div>
-      <p>Имя пользователя: {userProfile?.username}</p>
-      <p>Почтовый адрес: {userProfile?.email}</p>
-      <p>Телефон: {userProfile?.phoneNumber}</p>
-
+      <p>Имя пользователя: {username}</p>
+      <p>Почтовый адрес: {email}</p>
+      <p>Телефон: {phoneNumber}</p>
     </div>
   )
 }
