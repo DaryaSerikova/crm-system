@@ -183,7 +183,7 @@ const RegisterPage = () => {
           <div className={s.registerLink}>
             <p className={s.text}>Already have an account?</p>
             <Link to='/login' className={s.link}>
-              Create an account
+              Log in
             </Link>
           </div>
           { isOpenLink 
