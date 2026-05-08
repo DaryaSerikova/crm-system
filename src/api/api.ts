@@ -6,6 +6,7 @@ const baseUrl = 'https://easydev.club/api/v1';
 import axios from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
+import { getAccessToken } from "@/store/tokenStorage";
 
 const api = axios.create({
   baseURL: baseUrl,
@@ -15,8 +16,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => { //перед запросом
-  const state = store.getState();
-  const accessToken = state.auth.accessToken;
+  const accessToken = getAccessToken();
 
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;

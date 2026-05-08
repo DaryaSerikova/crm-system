@@ -180,6 +180,12 @@ const RegisterPage = () => {
               Register
             </Button>
           </Form>
+          <div className={s.registerLink}>
+            <p className={s.text}>Already have an account?</p>
+            <Link to='/login' className={s.link}>
+              Create an account
+            </Link>
+          </div>
           { isOpenLink 
             ? <Link to={"/login"}>
                 Перейти на страницу авторизации для входа в систему
