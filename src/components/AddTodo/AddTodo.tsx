@@ -1,4 +1,4 @@
-import type { TodoRequest } from '../../types/types';
+import type { TodoRequest } from '../../types/todo.types';
 import { Button, Form, Input, Flex } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import type { FormProps } from 'antd';

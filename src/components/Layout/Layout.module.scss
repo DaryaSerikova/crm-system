@@ -1,0 +1,74 @@
+//rgba(249, 249, 249, 1)
+//rgba(228, 228, 228, 1)
+//rgba(0, 0, 0, 1)
+
+.sidebar {
+  max-width: 248px;
+  height: 100vh;
+  position: sticky;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  background-color: rgba(249, 249, 249, 1);
+  border-right: 1px solid rgba(228, 228, 228, 1);
+  padding: 20px 10px;
+
+  .logo {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    padding: 22px 28px 22px 28px;
+    border-bottom: 1px solid rgba(228, 228, 228, 1);
+
+
+    .text {
+      font-family: Inter;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 140%;
+      letter-spacing: 0%;
+      color: rgba(0, 0, 0, 1);
+      margin-block-start: 0;
+      margin-block-end: 0;
+    }
+  }
+
+  .menuWithLogout {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+
+    .userLogout {
+      position: relative;
+
+      .user {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+  
+        .text {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-block-start: 0;
+          margin-block-end: 0;
+          margin-right: 1px;
+        }
+
+        .arrow {
+          transition: transform 0.3s ease;
+        }
+
+        .isOpen {
+          transform: rotate(180deg);
+        }
+      }
+      .logout {
+        position: absolute;
+        top: -40px;
+        right: 15px;
+      }
+    }
+  }
+}

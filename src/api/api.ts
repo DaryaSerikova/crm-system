@@ -1,6 +1,10 @@
-import type { MetaResponse, Filter, TodoRequest, Todo, TodoInfo } from "../types/types";
+import type { UserRegistration, Profile, AuthData, Token } from "../types/user.types";
+import type { MetaResponse, Filter, TodoRequest, Todo, TodoInfo, } from "../types/todo.types"
 const baseUrl = 'https://easydev.club/api/v1';
 import axios from 'axios';
+import { store } from '../store/store';
+import { setAuth, removeAuth } from "@/store/slices/authSlice";
+import { accessTokenManager } from "@/store/tokenStorage";
 
 const api = axios.create({
   baseURL: baseUrl,
@@ -8,6 +12,46 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+api.interceptors.request.use((config) => { //перед запросом
+  const accessToken = accessTokenManager.get();
+
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use((response) => response, //после ответа
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._isRetry) {
+      originalRequest._isRetry = true;
+      const oldRefreshToken = localStorage.getItem('refreshToken');
+
+      try {
+        const res = await axios.post(`${baseUrl}/auth/refresh`, {refreshToken: oldRefreshToken});
+        const { accessToken, refreshToken } = res.data; //new tokens
+
+        localStorage.setItem('refreshToken', refreshToken);
+        store.dispatch(setAuth(accessToken));
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        store.dispatch(removeAuth()); //logout
+        localStorage.removeItem('refreshToken');
+
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+
 
 export const getAllTodos = async (filter: Filter): Promise<MetaResponse<Todo, TodoInfo>> => {
   try {
@@ -54,5 +98,40 @@ export const deleteTodo = async (id: number): Promise<undefined> => {
     if (err instanceof Error) {
       throw new Error(`Failed to delete todo: ${err.message}`)
     }
+  }
+}
+
+//--- auth ---
+
+export const registerUser = async (user: UserRegistration): Promise<Profile | undefined> => {
+  try {
+    const response =  await api.post('/auth/signup', user);    
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Failed to register user: ${err.message}`);
+    }
+  }
+}
+
+export const loginUser = async (user: AuthData): Promise<Token | undefined> => {
+  try {
+    const response = await api.post('/auth/signin', user);
+    localStorage.setItem('refreshToken', response.data.refreshToken);
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Failed to login user: ${err.message}`)
+    }
+  }
+}
+
+export const getUserProfile = async (): Promise<Profile | undefined> => {
+  try {
+    const response = await api.get('/user/profile');
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error)
+      throw new Error(`Failed to get user profile: ${err.message}`);
   }
 }

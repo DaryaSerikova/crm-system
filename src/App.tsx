@@ -1,44 +1,38 @@
 import { Routes, Route } from 'react-router';
-import { useNavigate } from 'react-router';
-import type { MenuProps } from 'antd';
-import type { MenuInfo } from 'rc-menu/lib/interface';
-import { Menu } from 'antd';
 import TodoListPage from './pages/TodoListPage/TodoListPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
+import LoginPage from './pages/LoginPage/LoginPage';
+import RegisterPage from './pages/RegisterPage/RegisterPage';
+import { Layout } from './components/Layout/Layout';
+import { ProtectedAuth } from './components/ProtectedAuth/ProtectedAuth';
+import ThemeProvider from './components/ThemeProvider/ThemeProvider';
 import s from './App.module.scss';
+import LayoutAuth from './components/LayoutAuth/LayoutAuth';
 
 
-
-type MenuItem = Required<MenuProps>['items'][number];
-
-const items: MenuItem[] = [
-  { key: '/', label: 'Список задач' },
-  { key: '/profile', label: 'Профиль' },
-]
 
 function App() {
-  const navigate = useNavigate();
-
-  const handleMenuClick = (e: MenuInfo) => {
-    navigate(e.key);
-  };
 
   return (
-    <div className={s.app}>
-      <div style={{ maxWidth: 256 }}>
-        <Menu
-          onClick={handleMenuClick}
-          defaultSelectedKeys={[window.location.pathname]}
-          defaultOpenKeys={['sub1']}
-          mode="inline"
-          items={items}
-        />
+    <ThemeProvider>
+      <div className={s.app}>
+        <Routes>
+          
+          <Route element={<ProtectedAuth />}>
+            <Route path="/" element={<Layout/>}>
+              <Route path="/" element={<TodoListPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+          </Route>
+
+          <Route path="/" element={<LayoutAuth/>}>
+            <Route path="/login" element={<LoginPage />}></Route>
+            <Route path="/register" element={<RegisterPage />}></Route>
+          </Route>
+
+        </Routes>
       </div>
-      <Routes>
-        <Route path="/" element={<TodoListPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-      </Routes>
-    </div>
+    </ThemeProvider>
   )
 }
 

@@ -1,0 +1,104 @@
+//rgba(127, 38, 91, 1)
+//rgba(255, 255, 255, 1)
+// font-family: Nunito Sans;
+//rgba(222, 210, 217, 1)
+//rgba(130, 130, 130, 1)
+// color: rgba(82, 82, 82, 1);
+//rgba(130, 130, 130, 1)
+//rgba(127, 38, 91, 1)
+
+.login {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 811px;
+  // justify-content: center;
+  align-items: center;
+  justify-content: space-around;
+  // gap: 317px;
+  // gap: 30vh;
+
+  // @media (min-width: 1200px) {
+    // gap: 0;
+    // align-items: stretch;
+  // }
+
+
+
+  .card {
+    width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+
+  
+
+    .header {
+      width: 100%;
+
+      .h1 {
+        font-weight: 700;
+        font-size: 36px;
+        color: rgba(82, 82, 82, 1);
+        margin-block-start: 0;
+        margin-block-end: 0;
+        margin-left: 26.5px;
+        margin-right: 26.5px;
+        margin-top: 36px;
+      }
+      .p {
+        font-weight: 400;
+        font-size: 16px;
+        margin-block-start: 0;
+        margin-block-end: 0;
+        margin-left: 26.5px;
+        margin-right: 26.5px;
+      }
+
+    }
+    .loginForm {
+      width: 100%;
+    
+      .customInput {}
+      .customButton {  
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+        width: 100%;
+      }
+    } 
+
+  }
+
+  .registerLink {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 5px;
+
+    .text {
+      font-family: Nunito Sans;
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 100%;
+      letter-spacing: 0%;
+      color: rgba(130, 130, 130, 1);
+    }
+
+    .link {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      font-family: Nunito Sans;
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 100%;
+      letter-spacing: 0%;
+      color: rgba(127, 38, 91, 1);
+    }
+  }
+}
