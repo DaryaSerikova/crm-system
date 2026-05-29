@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Todo, Filter, TodoRequest } from '../../types/types';
+import type { Todo, Filter, TodoRequest } from '../../types/todo.types';
 import type { FormProps } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { Button, Checkbox, Form, Input, Row, Col, Space, Flex } from 'antd';

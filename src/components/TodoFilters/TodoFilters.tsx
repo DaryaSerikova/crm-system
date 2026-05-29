@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import type { Dispatch, SetStateAction } from 'react';
-import type { TodoInfo, Filter } from '../../types/types';
+import type { TodoInfo, Filter } from '../../types/todo.types';
 import s from './TodoFilters.module.scss'
 
 

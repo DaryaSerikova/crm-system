@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { MenuInfo } from 'rc-menu/lib/interface';
-import type { Profile } from '@/types/types';
+import type { Profile } from '@/types/user.types';
 import type { MenuProps } from 'antd';
 import { Outlet, useNavigate } from 'react-router';
 import { useAppDispatch } from '@/store/hooks';

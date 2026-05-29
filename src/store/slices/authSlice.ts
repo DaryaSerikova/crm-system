@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { setAccessToken } from "../tokenStorage";
+import { accessTokenManager } from "../tokenStorage";
 
 const initialState = {
-  // isAuth: !!localStorage.getItem('refreshToken'),
   isAuth: false,
   accessToken: null,
 };
@@ -13,11 +12,11 @@ const authSlice = createSlice({
   reducers: {
     setAuth(state, action) {
       state.isAuth = true;
-      setAccessToken(action.payload.accessToken); 
+      accessTokenManager.set(action.payload.accessToken);
     },
     removeAuth(state) {
       state.isAuth = false;
-      setAccessToken(null);
+      accessTokenManager.clear();
     }
   }
 })

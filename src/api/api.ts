@@ -1,12 +1,10 @@
-import type { 
-  MetaResponse, Filter, TodoRequest, Todo, TodoInfo, 
-  UserRegistration, Profile, AuthData, Token 
-} from "../types/types";
+import type { UserRegistration, Profile, AuthData, Token } from "../types/user.types";
+import type { MetaResponse, Filter, TodoRequest, Todo, TodoInfo, } from "../types/todo.types"
 const baseUrl = 'https://easydev.club/api/v1';
 import axios from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
-import { getAccessToken } from "@/store/tokenStorage";
+import { accessTokenManager } from "@/store/tokenStorage";
 
 const api = axios.create({
   baseURL: baseUrl,
@@ -16,7 +14,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => { //перед запросом
-  const accessToken = getAccessToken();
+  const accessToken = accessTokenManager.get();
 
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;

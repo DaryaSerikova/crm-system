@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Todo, Filter, TodoInfo, MetaResponse } from '../../types/types';
+import type { Todo, Filter, TodoInfo, MetaResponse } from '../../types/todo.types';
 import AddTodo from '../../components/AddTodo/AddTodo';
 import TodoFilters from '../../components/TodoFilters/TodoFilters';
 import TodoList from '../../components/TodoList/TodoList';
