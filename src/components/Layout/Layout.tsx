@@ -19,6 +19,7 @@ type MenuItem = Required<MenuProps>['items'][number];
 const items: MenuItem[] = [
   { key: '/', label: 'Список задач' },
   { key: '/profile', label: 'Профиль' },
+  { key: '/users', label: 'Пользователи' },
 ]
 
 const Layout = () => {

@@ -135,3 +135,17 @@ export const getUserProfile = async (): Promise<Profile | undefined> => {
       throw new Error(`Failed to get user profile: ${err.message}`);
   }
 }
+
+// ---- admin---
+
+export const getUsers = async () => {
+  try {
+    // const response = await api.get('/admin/users');
+    const response = undefined;
+
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error) 
+      throw new Error(`Failed to get users for admin: ${err.message}`);
+  }
+}
