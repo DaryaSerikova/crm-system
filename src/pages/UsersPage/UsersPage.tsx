@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table } from 'antd';
+import { Button, Table } from 'antd';
 import type { TableProps } from 'antd';
 import type { User } from '@/types/admin.types';
 import { getUsers } from '@/api/api';
@@ -7,6 +7,7 @@ import { setUsers } from '@/store/slices/adminSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { getHumanDate } from '@/utils/utils';
 import { openNotification } from '@/utils/errors';
+import { Link } from 'react-router';
 
 
 
@@ -41,6 +42,15 @@ const columns: TableProps<User>['columns'] = [
     render: (roles) => roles.length > 1 
       ? <div>{roles.join(', ')}</div> 
       : <div>{roles}</div>,
+  },
+  {
+    title: '',
+    dataIndex: 'other',
+    key: 'other',
+    render: (_, record) => 
+      <Link to={`/users/${record.id}`}>
+        <Button>Перейти</Button>
+      </Link>
   },
 ];
 

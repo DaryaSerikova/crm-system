@@ -42,7 +42,7 @@ export interface User {
 //   phoneNumber?: string;
 // }
 
-export enum Roles {
+export const enum Roles {
   ADMIN = "ADMIN",
   MODERATOR = "MODERATOR",
   USER = "USER",

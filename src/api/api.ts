@@ -5,6 +5,7 @@ import axios from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
 import { accessTokenManager } from "@/store/tokenStorage";
+import type { User } from "@/types/admin.types";
 
 const api = axios.create({
   baseURL: baseUrl,
@@ -140,12 +141,22 @@ export const getUserProfile = async (): Promise<Profile | undefined> => {
 
 export const getUsers = async () => {
   try {
-    // const response = await api.get('/admin/users');
-    const response = undefined;
-
+    const response = await api.get('/admin/users');
     return response.data;
   } catch (err: unknown) {
     if (err instanceof Error) 
       throw new Error(`Failed to get users for admin: ${err.message}`);
+  }
+}
+
+export const getUser = async (id: number): Promise<User | undefined> => {
+  try {
+    const response = await api.get(`/admin/users/${id}`);
+    console.log('response: ', response)
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Failed to get user ${id}: ${err.message}`)
+    }
   }
 }
