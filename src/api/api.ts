@@ -5,7 +5,7 @@ import axios from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
 import { accessTokenManager } from "@/store/tokenStorage";
-import type { User } from "@/types/admin.types";
+import type { User, UserRequest } from "@/types/admin.types";
 
 const api = axios.create({
   baseURL: baseUrl,
@@ -157,6 +157,17 @@ export const getUser = async (id: number): Promise<User | undefined> => {
   } catch (err: unknown) {
     if (err instanceof Error) {
       throw new Error(`Failed to get user ${id}: ${err.message}`)
+    }
+  }
+}
+
+export const editUser = async (id: number, userRequest: UserRequest): Promise<User | undefined> => {
+  try {
+    const response = api.put(`/admin/users/${id}`, userRequest);
+    return (await response).data;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Failed edit user ${id}: ${err.message}`)
     }
   }
 }

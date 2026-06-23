@@ -8,6 +8,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { getHumanDate } from '@/utils/utils';
 import { openNotification } from '@/utils/errors';
 import { Link } from 'react-router';
+import s from './UsersPage.module.scss';
 
 
 
@@ -83,7 +84,8 @@ const UsersPage = () => {
 
 
   return (
-    <div>UsersPage
+    <div className={s.usersPage}>
+      <h1 className={s.h1}> Пользователи </h1>
       <Table<User> 
         columns={columns} 
         dataSource={currentUsers || []}

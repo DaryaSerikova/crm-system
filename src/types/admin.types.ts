@@ -35,12 +35,12 @@ export interface User {
 // // старые + новые - roles: ['ADMIN', 'MODERATOR'] 
 // }
 
-// // Интерфейс для обновления данных пользователя
-// interface UserRequest{  
-//   username?: string; 
-//   email?: string; 
-//   phoneNumber?: string;
-// }
+// Интерфейс для обновления данных пользователя
+export interface UserRequest{  
+  username?: string; 
+  email?: string; 
+  phoneNumber?: string;
+}
 
 export const enum Roles {
   ADMIN = "ADMIN",
