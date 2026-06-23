@@ -171,3 +171,15 @@ export const editUser = async (id: number, userRequest: UserRequest): Promise<Us
     }
   }
 }
+
+export const deleteUser = async (id: number): Promise<void> => {
+  try {
+    // id = undefined;
+    await api.delete(`/admin/users/${id}`)
+
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Failed to delete user: ${err.message}`)
+    }
+  }
+} 
