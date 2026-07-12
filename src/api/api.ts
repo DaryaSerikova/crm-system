@@ -5,7 +5,7 @@ import axios from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
 import { accessTokenManager } from "@/store/tokenStorage";
-import type { User, UserRequest } from "@/types/admin.types";
+import type { Params, User, UserRequest } from "@/types/admin.types";
 
 const api = axios.create({
   baseURL: baseUrl,
@@ -139,9 +139,11 @@ export const getUserProfile = async (): Promise<Profile | undefined> => {
 
 // ---- admin---
 
-export const getUsers = async () => {
+export const getUsers = async (params: Params) => {
   try {
-    const response = await api.get('/admin/users');
+    const response = await api.get('/admin/users', {
+      params: params ,
+    });
     return response.data;
   } catch (err: unknown) {
     if (err instanceof Error) 

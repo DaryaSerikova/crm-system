@@ -48,3 +48,11 @@ export const enum Roles {
   USER = "USER",
 }
 
+
+export type SortBy = 'username' | 'email' | 'id';
+export type SortOrder = 'username' | 'email' | 'none';
+
+export interface Params {
+  sortBy?: SortBy,
+  sortOrder?: SortOrder,
+}

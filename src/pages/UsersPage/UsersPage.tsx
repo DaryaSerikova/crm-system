@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button, Table } from 'antd';
-// import Modal from 'antd';
+import { Button, Table,Select } from 'antd';
 import type { TableProps } from 'antd';
-import type { User } from '@/types/admin.types';
+import type { User, Params, SortBy, SortOrder } from '@/types/admin.types';
 import { getUsers } from '@/api/api';
 import { setUsers } from '@/store/slices/adminSlice';
 import { useAppDispatch } from '@/store/hooks';
@@ -15,15 +14,26 @@ import { deleteUser } from '@/api/api';
 
 
 
-
 const UsersPage = () => {
   const dispatch = useAppDispatch();
   const [currentUsers, setCurrentUsers] = useState<User[] | null>(null);
   const [deletingRecord, setDeletingRecord] = useState(null);
+  const [sortBy, setSortBy] = useState<SortBy | null>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder | null>(null);
+
 
   const getAndFetchUsers = async () => {
     try {
-      const users = await getUsers();
+      const params: Params = {};
+      if (sortBy) {
+        params.sortBy = sortBy;
+      }
+      if (sortOrder) {
+        params.sortOrder = sortOrder
+      }
+
+      const users = await getUsers(params);
+
       console.log('users: ', users);
       dispatch(setUsers(users.data));
       setCurrentUsers(users.data);
@@ -41,6 +51,10 @@ const UsersPage = () => {
   useEffect(() => {
     getAndFetchUsers();
   }, []);
+
+  useEffect(() => {
+    getAndFetchUsers();
+  }, [sortBy, sortOrder]);
 
 
   const handleDelete = async (record: User | null) => {
@@ -115,10 +129,41 @@ const UsersPage = () => {
     },
   ];
 
+  const handleSortBy = (value: SortBy) => {
+    console.log(`selected ${value}`);
+    setSortBy(value);
+  };
+
+  const handleSortOrder = (value: SortOrder) => {
+    console.log(`selected ${value}`);
+    setSortOrder(value);
+  }
+
 
   return (
     <div className={s.usersPage}>
       <h1 className={s.h1}> Пользователи </h1>
+      <Select
+        defaultValue="id"
+        style={{ width: 200 }}
+        onChange={handleSortBy}
+        options={[
+          { value: 'username', label: 'По имени' },
+          { value: 'email', label: 'По email' },
+          { value: 'id', label: 'По id' },
+        ]}
+      />
+      <Select
+        defaultValue="none"
+        style={{ width: 200 }}
+        onChange={handleSortOrder}
+        options={[
+          { value: 'asc', label: 'По возрастанию' },
+          { value: 'desc', label: 'По  убыванию' },
+          { value: 'none', label: 'По  умолчанию' },
+        ]}
+      />
+
       <Table<User> 
         columns={columns} 
         dataSource={currentUsers || []}
