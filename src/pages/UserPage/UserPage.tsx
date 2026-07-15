@@ -21,7 +21,7 @@ const UserPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdit, setIsEdit ] = useState<boolean>(false);
 
-const { Item } = Form;
+  const { Item } = Form;
   const { id } = useParams();
   console.log('id: ', id);
 

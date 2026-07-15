@@ -139,10 +139,11 @@ export const getUserProfile = async (): Promise<Profile | undefined> => {
 
 // ---- admin---
 
-export const getUsers = async (params: Params) => {
+export const getUsers = async (params: Params, controller: AbortController) => {
   try {
     const response = await api.get('/admin/users', {
       params: params ,
+      signal: controller.signal 
     });
     return response.data;
   } catch (err: unknown) {

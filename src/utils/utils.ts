@@ -1,3 +1,5 @@
+import type { Params } from "@/types/admin.types";
+
 export const getValidationMessage = (str: string): string => {
 
   const MIN_CHARACTERS_NUMBER = 2;
@@ -27,4 +29,15 @@ export const getHumanDate = (dateString: string) => {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+export const getClearAllValues = (params: Params) => { //!!! типизировать
+  const result: Params = {};
+  for (let [key, value] of Object.entries(params) as [keyof Params, Params[keyof Params]][] ) {
+    if (typeof value === 'string' && !!value?.trim()) {
+      result[key] = value?.trim() as Params[keyof Params];
+    }
+  }
+
+  return result;
 }
