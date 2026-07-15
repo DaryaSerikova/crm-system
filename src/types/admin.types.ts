@@ -50,6 +50,6 @@ export const enum Roles {
 
 export interface Params {
   sortBy?: 'username' | 'email' | 'id',
-  sortOrder?: 'username' | 'email' | 'none',
+  sortOrder?: 'asc' | 'desc' | 'none',
   search?: string,
 }
