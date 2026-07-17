@@ -1,3 +1,5 @@
+import type { PermissionAction } from "@/constants/permission";
+
 // // Интерфейс запроса для фильтрации и сортировки пользователей
 // interface UserFilters { 
 //   search?: string;
@@ -42,11 +44,14 @@ export interface UserRequest{
   phoneNumber?: string;
 }
 
-export const enum Roles {
+export enum Roles {
   ADMIN = "ADMIN",
   MODERATOR = "MODERATOR",
   USER = "USER",
 }
+// type RolesValues = typeof Roles [keyof typeof Roles];
+export type RolesValues = `${Roles}`;
+export type PermissionActionValues = typeof PermissionAction[keyof typeof PermissionAction];
 
 export interface Params {
   sortBy?: 'username' | 'email' | 'id',

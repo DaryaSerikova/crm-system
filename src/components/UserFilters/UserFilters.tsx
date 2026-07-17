@@ -1,6 +1,6 @@
 import { Select, Input, Form, Row, Col } from 'antd';
 import type { Params } from '@/types/admin.types';
-import { useDebounceCallback } from '@/utils/useDebounceCallback';
+import { useDebounceCallback } from '@/utils/hooks/useDebounceCallback';
 import s from './UserFilters.module.scss';
 
 

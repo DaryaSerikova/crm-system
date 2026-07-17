@@ -8,6 +8,8 @@ import type { FormProps } from 'antd';
 import { Button, Form, Input } from 'antd';
 import { editUser } from '../../api/api';
 import s from './UserPage.module.scss';
+import PermissionGuard from '@/components/PermissionGuard/PermissionGuard';
+import { PermissionAction } from '@/constants/permission';
 
 type FieldType = {
   username?: string;
@@ -97,9 +99,11 @@ const UserPage = () => {
           <p>{currentUser?.email}</p>
           <p>{currentUser?.phoneNumber}</p>
         </>}
-        {!isEdit && <Button onClick={() => setIsEdit(true)}>
-          Редактировать
-        </Button>}
+        {!isEdit && <PermissionGuard userAction={PermissionAction.UserEdit}>
+          <Button onClick={() => setIsEdit(true)}>
+            Редактировать
+          </Button>
+        </PermissionGuard>}
 
         {isEdit && <Form
           name="basic"

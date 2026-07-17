@@ -11,6 +11,8 @@ import { openNotification } from '@/utils/errors';
 import DeleteUserModal from '@/components/DeleteUserModal/DeleteUserModal';
 import UserFilters from '@/components/UserFilters/UserFilters';
 import s from './UsersPage.module.scss';
+import PermissionGuard from '@/components/PermissionGuard/PermissionGuard';
+import { PermissionAction } from '@/constants/permission';
 
 
 
@@ -117,9 +119,11 @@ const UsersPage = () => {
         <Link to={`/users/${record.id}`}>
           <Button>Перейти</Button>
         </Link>
-        <Button onClick={() => setDeletingRecord(record)}>
-          Удалить
-        </Button>
+        <PermissionGuard userAction={PermissionAction.UserDelete}>
+          <Button onClick={() => setDeletingRecord(record)}>
+            Удалить
+          </Button>
+        </PermissionGuard>
       </div>
     },
   ];
