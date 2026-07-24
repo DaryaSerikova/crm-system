@@ -5,14 +5,15 @@ import s from './UserFilters.module.scss';
 
 
 
+
 type UserFiltersProps = {
-  getAndFetchUsers: (allValues?: Params) => void;
+  setAndFetchUsers: (allValues?: Params) => void;
 }
 
-const UserFilters = ({getAndFetchUsers}: UserFiltersProps) => {
+const UserFilters = ({setAndFetchUsers}: UserFiltersProps) => {
   const { Item } = Form;
 
-  const debouncedGetAndFetchUsers = useDebounceCallback(getAndFetchUsers, 400);
+  const debouncedGetAndFetchUsers = useDebounceCallback(setAndFetchUsers, 400);
 
   const handleValuesChange = (changedValues: Params, allValues: Params) => {
     console.log('changedValues: ', changedValues);
@@ -21,7 +22,7 @@ const UserFilters = ({getAndFetchUsers}: UserFiltersProps) => {
     if ('search' in changedValues) { //только для инпута debounce
       debouncedGetAndFetchUsers(allValues);
     } else {
-      getAndFetchUsers(allValues);
+      setAndFetchUsers(allValues);
     }
   }
 

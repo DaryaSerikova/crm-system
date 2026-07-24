@@ -3,28 +3,33 @@ import { Link } from 'react-router';
 import { Button, Table } from 'antd';
 import type { TableProps } from 'antd';
 import type { User } from '@/types/admin.types';
-import { getUsers, deleteUser } from '@/api/api';
+import { getUsers, deleteUser, blockUser, unblockUser } from '@/api/api';
 import { setUsers } from '@/store/slices/adminSlice';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getClearAllValues, getHumanDate } from '@/utils/utils';
 import { openNotification } from '@/utils/errors';
-import DeleteUserModal from '@/components/DeleteUserModal/DeleteUserModal';
 import UserFilters from '@/components/UserFilters/UserFilters';
-import s from './UsersPage.module.scss';
 import PermissionGuard from '@/components/PermissionGuard/PermissionGuard';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { PermissionAction } from '@/constants/permission';
+import s from './UsersPage.module.scss';
 
 
+
+type HandleBlockUser = {isBlocked: boolean, id: number}
 
 const UsersPage = () => {
   const dispatch = useAppDispatch();
   const [currentUsers, setCurrentUsers] = useState<User[] | null>(null);
-  const [deletingRecord, setDeletingRecord] = useState(null);
+  const [deletingUser, setDeletingUser] = useState(null);
+  const [blockingUser, setBlockingUser] = useState<User | null>(null);
+  const [qweryParams, setQweryParams] = useState({})
+  const user = useAppSelector(state => state.user);
+  console.log('USER:', user)
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
-
-  const getAndFetchUsers = async (params = {}) => { //!!!подумать params {} или undefined null
+  const setAndFetchUsers = async (params = {}) => { //!!!подумать params {} или undefined null
     try {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -37,6 +42,7 @@ const UsersPage = () => {
 
       console.log('users: ', users);
       dispatch(setUsers(users.data));
+      setQweryParams(params);
       setCurrentUsers(users.data);
     } catch(err: unknown) {
       if (err instanceof Error) {
@@ -48,16 +54,42 @@ const UsersPage = () => {
       }
     }
   }
+  const postBlockUser = async (id: number) => {
+    try {
+      await blockUser(id);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        openNotification({
+          type: 'error',
+          title: 'ERROR',
+          description: `Blocking user ${id} are failed`
+        })
+      }
+    }
+  }
+  const postUnblockUser = async (id: number) => {
+    try {
+      await unblockUser(id);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        openNotification({
+          type: 'error',
+          title: 'ERROR',
+          description: 'Unblocking user ${id} are failed'
+        })
+      }
+    }
+  }
 
   useEffect(() => {
-    getAndFetchUsers();
+    setAndFetchUsers();
   }, []);
 
 
   const handleDelete = async (record: User | null) => {
     if (record !== null) {
       const {id} = record;
-      setDeletingRecord(null);
+      setDeletingUser(null);
   
       try {
         console.log('delete')
@@ -78,6 +110,18 @@ const UsersPage = () => {
       }
     }
   };
+  const handleBlockUser = async ({isBlocked, id}: HandleBlockUser) => {
+    if (isBlocked) {
+      console.log('UNBLOCK');
+      await postUnblockUser(id);
+      await setAndFetchUsers(qweryParams);
+    } else {
+      console.log('BLOCK')
+      await postBlockUser(id);
+      await setAndFetchUsers(qweryParams);
+      setBlockingUser(null);
+    }
+  }
 
   const columns: TableProps<User>['columns'] = [
     {
@@ -101,7 +145,12 @@ const UsersPage = () => {
       title: 'Статус блокировки',
       dataIndex: 'isBlocked',
       key: 'isBlocked',
-      render: (isBlocked) => <a>{isBlocked ? 'Заблокирован' : 'Незаблокирован'}</a>,
+      render: (isBlocked, user) => <div>
+        {isBlocked ? 'Заблокирован' : 'Незаблокирован'}
+        <Button onClick={() => setBlockingUser(user)}>
+          {isBlocked ? 'Разблокировать' : 'Заблокировать'}
+        </Button>
+      </div>,
     },
     {
       title: 'Роли',
@@ -120,7 +169,7 @@ const UsersPage = () => {
           <Button>Перейти</Button>
         </Link>
         <PermissionGuard userAction={PermissionAction.UserDelete}>
-          <Button onClick={() => setDeletingRecord(record)}>
+          <Button onClick={() => setDeletingUser(record)}>
             Удалить
           </Button>
         </PermissionGuard>
@@ -132,18 +181,35 @@ const UsersPage = () => {
     <div className={s.usersPage}>
       <h1 className={s.h1}> Пользователи </h1>
       <UserFilters 
-        getAndFetchUsers={getAndFetchUsers} 
+        setAndFetchUsers={setAndFetchUsers} 
       />
       <Table<User> 
         columns={columns} 
         dataSource={currentUsers || []}
         loading={currentUsers === null} 
       />
-      <DeleteUserModal 
-        isOpen={Boolean(deletingRecord)}
-        record={deletingRecord}
-        onClose={() => setDeletingRecord(null)}
+      <ConfirmModal 
+        isOpen={Boolean(deletingUser)}
+        user={deletingUser}
+        onClose={() => setDeletingUser(null)}
         onConfirm={handleDelete}
+        title="Подтверждение удаления"
+        okButtonText="Удалить"
+        bodyText="Вы уверены, что хотите удалить этого пользователя?"
+      />
+      <ConfirmModal 
+        isOpen={Boolean(blockingUser)}
+        user={blockingUser}
+        onClose={() => setBlockingUser(null)}
+        onConfirm={() => handleBlockUser({
+          isBlocked: blockingUser?.isBlocked, 
+          id: blockingUser?.id
+        })}
+        title={`Подтверждение ${blockingUser?.isBlocked ? 'разблокировки' : 'блокировки'}`}
+        okButtonText={`${blockingUser?.isBlocked ? 'Разблокировать' : 'Заблокировать'}`}
+        bodyText={`Вы уверены, что хотите 
+          ${blockingUser?.isBlocked ? 'разблокировать' : 'заблокировать'} 
+          этого пользователя?`}
       />
     </div>
   )

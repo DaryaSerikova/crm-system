@@ -1,12 +1,12 @@
 import type { UserRegistration, Profile, AuthData, Token } from "../types/user.types";
 import type { MetaResponse, Filter, TodoRequest, Todo, TodoInfo, } from "../types/todo.types"
-const baseUrl = 'https://easydev.club/api/v1';
 import axios from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
 import { accessTokenManager } from "@/store/tokenStorage";
-import type { Params, User, UserRequest } from "@/types/admin.types";
+import type { Params, User, UserRequest, UserRolesRequest } from "@/types/admin.types";
 
+const baseUrl = 'https://easydev.club/api/v1';
 const api = axios.create({
   baseURL: baseUrl,
   headers: {
@@ -186,3 +186,37 @@ export const deleteUser = async (id: number): Promise<void> => {
     }
   }
 } 
+
+export const blockUser = async (id: number): Promise<void> => { //!!!типы Promise<User>
+  try {
+    await api.post(`/admin/users/${id}/block`);
+  } catch(err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Failed to block user: ${err.message}`)
+    }
+  }
+}
+
+export const unblockUser = async (id: number): Promise<void> => { //!!! Promise<User>
+  try {
+    await api.post(`/admin/users/${id}/unblock`);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Failed to block user: ${err.message}`)
+    }
+  }
+}
+
+export const changeUserRights = async (
+  {id, userRolesRequest}: {id: number, userRolesRequest: UserRolesRequest})
+  : Promise<void> => { // //Promise<User | undefined>
+  try {
+    const response = await api.post(`/admin/users/${id}/rights`, userRolesRequest);
+    console.log('changeRightsUser | response.data: ', response.data)
+    return response.data;
+  } catch(err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Failed to change rights for user ${id}: ${err.message}`);
+    }
+  }
+}
