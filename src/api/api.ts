@@ -207,11 +207,10 @@ export const unblockUser = async (id: number): Promise<void> => { //!!! Promise<
   }
 }
 
-export const changeUserRights = async (
-  {id, userRolesRequest}: {id: number, userRolesRequest: UserRolesRequest})
-  : Promise<void> => { // //Promise<User | undefined>
+
+export const changeUserRoles = async (id: number, roles: any): Promise<void> => { //!!!  типы //Promise<User | undefined>
   try {
-    const response = await api.post(`/admin/users/${id}/rights`, userRolesRequest);
+    const response = await api.post(`/admin/users/${id}/rights`, {roles: roles});
     console.log('changeRightsUser | response.data: ', response.data)
     return response.data;
   } catch(err: unknown) {

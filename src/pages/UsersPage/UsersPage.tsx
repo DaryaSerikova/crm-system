@@ -3,7 +3,8 @@ import { Link } from 'react-router';
 import { Button, Table } from 'antd';
 import type { TableProps } from 'antd';
 import type { User } from '@/types/admin.types';
-import { getUsers, deleteUser, blockUser, unblockUser } from '@/api/api';
+import { Roles } from '@/types/admin.types';
+import { getUsers, deleteUser, blockUser, unblockUser, changeUserRoles } from '@/api/api';
 import { setUsers } from '@/store/slices/adminSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getClearAllValues, getHumanDate } from '@/utils/utils';
@@ -13,6 +14,7 @@ import PermissionGuard from '@/components/PermissionGuard/PermissionGuard';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { PermissionAction } from '@/constants/permission';
 import s from './UsersPage.module.scss';
+import { Select, Form } from 'antd';
 
 
 
@@ -24,8 +26,14 @@ const UsersPage = () => {
   const [deletingUser, setDeletingUser] = useState(null);
   const [blockingUser, setBlockingUser] = useState<User | null>(null);
   const [qweryParams, setQweryParams] = useState({})
+
+  const [rolesValue, setRolesValue] = useState(null);
+  const [rolesUser, setRolesUser] = useState(null);
+
   const user = useAppSelector(state => state.user);
-  console.log('USER:', user)
+  useEffect(() => {
+    console.log('USER:', user)
+  }, [])
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -123,6 +131,35 @@ const UsersPage = () => {
     }
   }
 
+  const isAdmin = true;
+  const rolesOptions = Object.values(Roles).map(
+    (item) => ({value: item, label: item})
+  );
+  
+  const handleChangeRoles = async (user, newRoles) => { // !!! типизировать
+    console.log('value newRoles: ', newRoles); //newRoles //value
+    
+    try {
+      await changeUserRoles(user.id, newRoles); 
+      await setAndFetchUsers(qweryParams);
+      setRolesValue(null);
+
+      openNotification({
+        type: 'success',
+        title: 'SUCCESS',
+        description: `Admin: user ${user.id} rights (roles) were changed` 
+      })
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        openNotification({
+          type: 'error',
+          title: 'ERROR',
+          description: `Admin: user ${user.id} rights (roles) were not changed` 
+        })
+      }
+    }
+  }
+
   const columns: TableProps<User>['columns'] = [
     {
       title: 'Имя пользователя',
@@ -147,18 +184,35 @@ const UsersPage = () => {
       key: 'isBlocked',
       render: (isBlocked, user) => <div>
         {isBlocked ? 'Заблокирован' : 'Незаблокирован'}
-        <Button onClick={() => setBlockingUser(user)}>
-          {isBlocked ? 'Разблокировать' : 'Заблокировать'}
-        </Button>
+        <PermissionGuard userAction={PermissionAction.UserBlock}>
+          <Button onClick={() => setBlockingUser(user)}>
+            {isBlocked ? 'Разблокировать' : 'Заблокировать'}
+          </Button>
+        </PermissionGuard>
       </div>,
     },
     {
       title: 'Роли',
       dataIndex: 'roles',
       key: 'roles',
-      render: (roles) => roles.length > 1 
-        ? <div>{roles.join(', ')}</div> 
-        : <div>{roles}</div>,
+      render: (roles, user) => {
+        return (isAdmin 
+        ? <Form>
+            <Select 
+              mode="multiple"
+              options={rolesOptions}
+              style={{ width: '150px' }}
+              // defaultValue={[...roles]}
+              value={rolesValue ?? roles}
+              onChange={(value) => {
+                setRolesValue(value);
+                setRolesUser(user);
+              }}                          
+            />
+          </Form>
+        : roles.length > 1 ? <div>{roles.join(', ')}</div> : <div>{roles}</div>)
+      },
+        
     },
     {
       title: '',
@@ -205,11 +259,24 @@ const UsersPage = () => {
           isBlocked: blockingUser?.isBlocked, 
           id: blockingUser?.id
         })}
+        //!!! onConfirm тоже проблема с аргументами
         title={`Подтверждение ${blockingUser?.isBlocked ? 'разблокировки' : 'блокировки'}`}
         okButtonText={`${blockingUser?.isBlocked ? 'Разблокировать' : 'Заблокировать'}`}
         bodyText={`Вы уверены, что хотите 
           ${blockingUser?.isBlocked ? 'разблокировать' : 'заблокировать'} 
           этого пользователя?`}
+      />
+      <ConfirmModal 
+        isOpen={Boolean(rolesValue)}
+        user={rolesUser}
+        onClose={() => {
+          setRolesValue(null);
+          setRolesUser(null);
+        }}
+        onConfirm={() => handleChangeRoles(rolesUser, rolesValue)}
+        title="Подтверждение изменения прав пользователя"
+        okButtonText="Изменить права"
+        bodyText="Вы уверены, что хотите изменить права этого пользователя?"
       />
     </div>
   )

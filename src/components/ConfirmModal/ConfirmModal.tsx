@@ -5,6 +5,7 @@ interface DeleteUserModalProps {
   isOpen: boolean,
   onClose: () => void,
   onConfirm: (record: User | null) => void,
+  // onConfirm: (...args: unknown[]) => void,
   user: User | null,
   title: string,
   okButtonText: string,
@@ -22,16 +23,13 @@ const ConfirmModal = ({
 
   return (
     <Modal
-      // title="Подтверждение удаления"
       title={title}
-
       open={isOpen}
       onCancel={onClose}
-      onOk={() => onConfirm(user)}
+      
+      onOk={() => onConfirm(user)} //!!! все равно для roles иначе
 
-      // okText="Удалить"
       okText={okButtonText}
-
       cancelText="Отмена"
       okButtonProps={{ danger: true }}
     >
@@ -39,19 +37,7 @@ const ConfirmModal = ({
       <p>
         <strong>{user?.username}</strong>: {bodyText}
       </p> 
-    </Modal>
-    // <Modal
-    //   title="Подтверждение удаления"
-    //   open={isOpen}
-    //   onCancel={onClose}
-    //   onOk={() => onConfirm(record)}
-    //   okText="Удалить"
-    //   cancelText="Отмена"
-    //   okButtonProps={{ danger: true }}
-    // >
-    //   <p>Вы действительно хотите удалить пользователя <strong>{record?.username}</strong>?</p>
-    // </Modal>
-    
+    </Modal>    
   );
 };
 
