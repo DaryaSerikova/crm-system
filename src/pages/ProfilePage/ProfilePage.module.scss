@@ -1,5 +1,7 @@
 .profilePage {
   margin: 25px 0;
+  margin-left: var(--sidebar-width);
+  width: 100% - var(--sidebar-width);
 
   .h1, .section {
     margin-left: 25px;

@@ -5,6 +5,7 @@
 :root {
   box-sizing: border-box;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --sidebar-width: 170px;
 }
 
 a {

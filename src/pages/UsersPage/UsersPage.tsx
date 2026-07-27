@@ -165,23 +165,27 @@ const UsersPage = () => {
       title: 'Имя пользователя',
       dataIndex: 'username',
       key: 'username',
+      // width: 110,
       render: (text) => <a>{text}</a>,
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      // width: 150,
     },
     {
       title: 'Дата регистрации',
       dataIndex: 'date',
       key: 'date',
+      width: 120,
       render: (dateString) => <>{getHumanDate(dateString)}</>,
     },
     {
       title: 'Статус блокировки',
       dataIndex: 'isBlocked',
       key: 'isBlocked',
+      width: 190,
       render: (isBlocked, user) => <div>
         {isBlocked ? 'Заблокирован' : 'Незаблокирован'}
         <PermissionGuard userAction={PermissionAction.UserBlock}>
@@ -195,6 +199,7 @@ const UsersPage = () => {
       title: 'Роли',
       dataIndex: 'roles',
       key: 'roles',
+      width: 160,
       render: (roles, user) => {
         return (isAdmin 
         ? <Form>
@@ -218,6 +223,7 @@ const UsersPage = () => {
       title: '',
       dataIndex: 'other',
       key: 'other',
+      width: 130,
       render: (_, record ) => <div>
         <Link to={`/users/${record.id}`}>
           <Button>Перейти</Button>
@@ -241,6 +247,7 @@ const UsersPage = () => {
         columns={columns} 
         dataSource={currentUsers || []}
         loading={currentUsers === null} 
+        tableLayout="fixed"
       />
       <ConfirmModal 
         isOpen={Boolean(deletingUser)}
