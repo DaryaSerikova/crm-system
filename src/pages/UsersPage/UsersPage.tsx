@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router';
 import { Button, Table } from 'antd';
 import type { TableProps } from 'antd';
-import type { User } from '@/types/admin.types';
+import type { RolesValues, User } from '@/types/admin.types';
 import { Roles } from '@/types/admin.types';
 import { getUsers, deleteUser, blockUser, unblockUser, changeUserRoles } from '@/api/api';
 import { setUsers } from '@/store/slices/adminSlice';
@@ -15,20 +15,22 @@ import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { PermissionAction } from '@/constants/permission';
 import s from './UsersPage.module.scss';
 import { Select, Form } from 'antd';
+import { usePermission } from '@/utils/hooks/usePermission';
 
 
 
-type HandleBlockUser = {isBlocked: boolean, id: number}
 
 const UsersPage = () => {
   const dispatch = useAppDispatch();
   const [currentUsers, setCurrentUsers] = useState<User[] | null>(null);
-  const [deletingUser, setDeletingUser] = useState(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [blockingUser, setBlockingUser] = useState<User | null>(null);
   const [qweryParams, setQweryParams] = useState({})
 
-  const [rolesValue, setRolesValue] = useState(null);
-  const [rolesUser, setRolesUser] = useState(null);
+  const [rolesValue, setRolesValue] = useState<RolesValues | null>(null);
+  const [rolesUser, setRolesUser] = useState<User | null>(null);
+
+  const {isAllowedAction: isAllowedRoles} = usePermission(PermissionAction.UserRoles);
 
   const user = useAppSelector(state => state.user);
   useEffect(() => {
@@ -93,15 +95,15 @@ const UsersPage = () => {
     setAndFetchUsers();
   }, []);
 
-
-  const handleDelete = async (record: User | null) => {
-    if (record !== null) {
-      const {id} = record;
+  const handleDelete = async (user: User | null) => {
+    if (user !== null) {
+      const {id} = user;
       setDeletingUser(null);
   
       try {
         console.log('delete')
         await deleteUser(id);
+        await setAndFetchUsers(qweryParams);
         openNotification({
           type: 'success',
           title: 'SUCCESS',
@@ -118,44 +120,48 @@ const UsersPage = () => {
       }
     }
   };
-  const handleBlockUser = async ({isBlocked, id}: HandleBlockUser) => {
-    if (isBlocked) {
-      console.log('UNBLOCK');
-      await postUnblockUser(id);
-      await setAndFetchUsers(qweryParams);
-    } else {
-      console.log('BLOCK')
-      await postBlockUser(id);
-      await setAndFetchUsers(qweryParams);
-      setBlockingUser(null);
+  const handleBlockUser = async (user: User | null) => { //!!! сломалось обновление? нет, не блокируется
+    if (user) {
+      const {isBlocked, id} = user;
+      if (isBlocked) {
+        console.log('UNBLOCK');
+        await postUnblockUser(id);
+        await setAndFetchUsers(qweryParams);
+      } else {
+        console.log('BLOCK')
+        await postBlockUser(id);
+        await setAndFetchUsers(qweryParams);
+        setBlockingUser(null);
+      }
     }
   }
 
-  const isAdmin = true;
   const rolesOptions = Object.values(Roles).map(
     (item) => ({value: item, label: item})
   );
   
-  const handleChangeRoles = async (user, newRoles) => { // !!! типизировать
+  const handleChangeRoles = async (user: User | null, newRoles: RolesValues | null) => {
     console.log('value newRoles: ', newRoles); //newRoles //value
     
-    try {
-      await changeUserRoles(user.id, newRoles); 
-      await setAndFetchUsers(qweryParams);
-      setRolesValue(null);
+    if (user) { //!!! ???
+      try {
+          await changeUserRoles(user.id, newRoles); 
+          await setAndFetchUsers(qweryParams);
+          setRolesValue(null);
 
-      openNotification({
-        type: 'success',
-        title: 'SUCCESS',
-        description: `Admin: user ${user.id} rights (roles) were changed` 
-      })
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        openNotification({
-          type: 'error',
-          title: 'ERROR',
-          description: `Admin: user ${user.id} rights (roles) were not changed` 
-        })
+          openNotification({
+            type: 'success',
+            title: 'SUCCESS',
+            description: `Admin: user ${user.id} rights (roles) were changed` 
+          })
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          openNotification({
+            type: 'error',
+            title: 'ERROR',
+            description: `Admin: user ${user.id} rights (roles) were not changed` 
+          })
+        }
       }
     }
   }
@@ -165,14 +171,12 @@ const UsersPage = () => {
       title: 'Имя пользователя',
       dataIndex: 'username',
       key: 'username',
-      // width: 110,
       render: (text) => <a>{text}</a>,
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      // width: 150,
     },
     {
       title: 'Дата регистрации',
@@ -201,7 +205,7 @@ const UsersPage = () => {
       key: 'roles',
       width: 160,
       render: (roles, user) => {
-        return (isAdmin 
+        return (isAllowedRoles 
         ? <Form>
             <Select 
               mode="multiple"
@@ -249,6 +253,7 @@ const UsersPage = () => {
         loading={currentUsers === null} 
         tableLayout="fixed"
       />
+      {/* !!! Можно унифицировать количество передаваемых параметров ? */}
       <ConfirmModal 
         isOpen={Boolean(deletingUser)}
         user={deletingUser}
@@ -262,11 +267,7 @@ const UsersPage = () => {
         isOpen={Boolean(blockingUser)}
         user={blockingUser}
         onClose={() => setBlockingUser(null)}
-        onConfirm={() => handleBlockUser({
-          isBlocked: blockingUser?.isBlocked, 
-          id: blockingUser?.id
-        })}
-        //!!! onConfirm тоже проблема с аргументами
+        onConfirm={() => handleBlockUser(blockingUser)}
         title={`Подтверждение ${blockingUser?.isBlocked ? 'разблокировки' : 'блокировки'}`}
         okButtonText={`${blockingUser?.isBlocked ? 'Разблокировать' : 'Заблокировать'}`}
         bodyText={`Вы уверены, что хотите 

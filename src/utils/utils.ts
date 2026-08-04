@@ -34,8 +34,11 @@ export const getHumanDate = (dateString: string) => {
 export const getClearAllValues = (params: Params) => { //!!! типизировать
   const result: Params = {};
   for (let [key, value] of Object.entries(params) as [keyof Params, Params[keyof Params]][] ) {
-    if (typeof value === 'string' && !!value?.trim()) {
+    if (key !== 'isBlocked' && typeof value === 'string' && !!value?.trim()) {
       result[key] = value?.trim() as Params[keyof Params];
+    }
+    if (key === 'isBlocked' && typeof value === 'boolean') {
+      result[key] = value;
     }
   }
 

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
 import { accessTokenManager } from "@/store/tokenStorage";
-import type { Params, User, UserRequest, UserRolesRequest } from "@/types/admin.types";
+import type { Params, User, UserRequest } from "@/types/admin.types";
 
 const baseUrl = 'https://easydev.club/api/v1';
 const api = axios.create({
@@ -187,7 +187,7 @@ export const deleteUser = async (id: number): Promise<void> => {
   }
 } 
 
-export const blockUser = async (id: number): Promise<void> => { //!!!типы Promise<User>
+export const blockUser = async (id: number): Promise<void> => { //!!! todo: типы Promise<User>
   try {
     await api.post(`/admin/users/${id}/block`);
   } catch(err: unknown) {
@@ -197,7 +197,7 @@ export const blockUser = async (id: number): Promise<void> => { //!!!типы Pr
   }
 }
 
-export const unblockUser = async (id: number): Promise<void> => { //!!! Promise<User>
+export const unblockUser = async (id: number): Promise<void> => { //!!! todo: Promise<User>
   try {
     await api.post(`/admin/users/${id}/unblock`);
   } catch (err: unknown) {

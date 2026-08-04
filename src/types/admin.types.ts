@@ -57,4 +57,5 @@ export interface Params {
   sortBy?: 'username' | 'email' | 'id',
   sortOrder?: 'asc' | 'desc' | 'none',
   search?: string,
+  isBlocked: boolean | 'all',
 }

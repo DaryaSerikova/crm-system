@@ -17,7 +17,7 @@ export const usePermission = (userAction = 'user.view') => {
 
     if (Array.isArray(_allowedRoles)) {
       const res = _allowedRoles.some((allowedRole) => 
-        user.roles.includes(allowedRole));
+        user.roles?.includes(allowedRole));
       return res;
     }
     return user.roles === _allowedRoles;

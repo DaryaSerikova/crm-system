@@ -7,6 +7,7 @@ export enum PermissionAction {
   UserDelete = 'user.delete', //ad
   // UserFilter = 'user.filter', //moder ad ??? вообще нужен?
   UserBlock = 'user.block', //moder ad чет я запуталась тут
+  UserBlockFilter = 'user.block.filter',
   UserRoles = 'user.roles', //ad 
 }
 
@@ -22,5 +23,6 @@ export const PERMISSIONS_MAP: PermissionMap = { //пересмотреть
 
   // 'user.filter': 
   'user.block': ['ADMIN', 'MODERATOR'],
+  'user.block.filter': ['ADMIN'],
   'user.roles': ['ADMIN'],
 };

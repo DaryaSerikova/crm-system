@@ -2,6 +2,8 @@ import { Select, Input, Form, Row, Col } from 'antd';
 import type { Params } from '@/types/admin.types';
 import { useDebounceCallback } from '@/utils/hooks/useDebounceCallback';
 import s from './UserFilters.module.scss';
+import PermissionGuard from '../PermissionGuard/PermissionGuard';
+import { PermissionAction } from '@/constants/permission';
 
 
 
@@ -70,6 +72,21 @@ const UserFilters = ({setAndFetchUsers}: UserFiltersProps) => {
           </Item>
         </Col>
       </Row>
+      <PermissionGuard userAction={PermissionAction.UserBlockFilter}>
+        <Item
+        name="isBlocked"
+        label="Статус блокировки"
+        >
+          <Select
+            defaultValue='Все'
+            options={[
+              { value: true, label: 'Заблокированые' },
+              { value: false, label: 'Активные' },
+              { value: 'all', label: 'Все' },
+            ]}
+          />
+        </Item>
+      </PermissionGuard>
 
       <Item<Params>
         name="search" 
