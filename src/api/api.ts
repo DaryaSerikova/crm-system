@@ -1,6 +1,6 @@
 import type { UserRegistration, Profile, AuthData, Token } from "../types/user.types";
 import type { MetaResponse, Filter, TodoRequest, Todo, TodoInfo, } from "../types/todo.types"
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
 import { accessTokenManager } from "@/store/tokenStorage";
@@ -14,6 +14,43 @@ const api = axios.create({
   },
 });
 
+const handleUnauthorizedError = async (error: AxiosError) => {
+  console.log('UNAUTHORIZED ERROR error: ', error)
+  console.log('UNAUTHORIZED ERROR axios.isCancel(error): ', axios.isCancel(error))
+
+  if (axios.isCancel(error)) {
+    return Promise.reject(error);
+  }
+
+  const originalRequest = error.config;
+  const isUnauthorized = error.response?.status === 401;
+  const isRetry = originalRequest._isRetry;
+
+  if (isUnauthorized && !isRetry) {
+    originalRequest._isRetry = true;
+    const oldRefreshToken = localStorage.getItem('refreshToken');
+
+    try {
+      const res = await axios.post(`${baseUrl}/auth/refresh`, {refreshToken: oldRefreshToken});
+      const { accessToken, refreshToken } = res.data; //new tokens
+
+      localStorage.setItem('refreshToken', refreshToken);
+      store.dispatch(setAuth(accessToken));
+
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      return api(originalRequest);
+    } catch (refreshError) {
+      console.log('REFRESH ERROR')
+      store.dispatch(removeAuth()); //logout
+      localStorage.removeItem('refreshToken');
+
+      return Promise.reject(refreshError);
+    }
+  }
+
+  return Promise.reject(error);
+}
+
 api.interceptors.request.use((config) => { //перед запросом
   const accessToken = accessTokenManager.get();
 
@@ -24,32 +61,7 @@ api.interceptors.request.use((config) => { //перед запросом
 });
 
 api.interceptors.response.use((response) => response, //после ответа
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._isRetry) {
-      originalRequest._isRetry = true;
-      const oldRefreshToken = localStorage.getItem('refreshToken');
-
-      try {
-        const res = await axios.post(`${baseUrl}/auth/refresh`, {refreshToken: oldRefreshToken});
-        const { accessToken, refreshToken } = res.data; //new tokens
-
-        localStorage.setItem('refreshToken', refreshToken);
-        store.dispatch(setAuth(accessToken));
-
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        store.dispatch(removeAuth()); //logout
-        localStorage.removeItem('refreshToken');
-
-        return Promise.reject(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
-  }
+  (error) => handleUnauthorizedError(error)
 );
 
 
@@ -151,7 +163,12 @@ export const getUsers = async (params: Params, controller: AbortController) => {
     return response.data;
   } catch (err: unknown) {
     if (err instanceof Error) 
-      throw new Error(`Failed to get users for admin: ${err.message}`);
+
+    console.log('axios.isCancel(err): ',axios.isCancel(err))
+    if (axios.isCancel(err)) {
+      throw err;
+    }
+    throw new Error(`Failed to get users for admin: ${err.message}`);
   }
 }
 

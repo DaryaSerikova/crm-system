@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router';
-import { Button, Table } from 'antd';
+import { Button, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import type { Params, RolesValues, User } from '@/types/admin.types';
 import { Roles } from '@/types/admin.types';
 import { getUsers, deleteUser, blockUser, unblockUser, changeUserRoles } from '@/api/api';
 import { setUsers } from '@/store/slices/adminSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { getClearAllValues, getHumanDate } from '@/utils/utils';
+import { getClearAllValues, getHumanDate, getHumanPhone } from '@/utils/utils';
 import { openNotification } from '@/utils/errors';
 import UserFilters from '@/components/UserFilters/UserFilters';
 import PermissionGuard from '@/components/PermissionGuard/PermissionGuard';
@@ -16,6 +16,9 @@ import { PermissionAction } from '@/constants/permission';
 import s from './UsersPage.module.scss';
 import { Select, Form } from 'antd';
 import { usePermission } from '@/utils/hooks/usePermission';
+import axios from 'axios';
+import PhoneIcon from '@/assets/icons/PhoneIcon';
+import LetterIcon from '@/assets/icons/LetterIcon';
 
 
 
@@ -36,8 +39,13 @@ const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const PAGE_SIZE = 20; 
 
-
   const {isAllowedAction: isAllowedRoles} = usePermission(PermissionAction.UserRoles);
+
+  const roleColors = {
+    user: 'purple',
+    admin: 'blue',
+    moderator: 'orange',
+  }
 
   const user = useAppSelector(state => state.user);
   useEffect(() => {
@@ -68,6 +76,11 @@ const UsersPage = () => {
       // setData(users.data);         // !!! (в диспатче то же самое выше) Записываем массив данных
       setTotalUsers(users.meta.totalAmount);   // Важно: бэкенд должен возвращать общее количество строк в БД
     } catch(err: unknown) {
+
+      console.log('setAndFetchUsers | axios.isCancel(err): ', axios.isCancel(err))
+      if (axios.isCancel(err) || err?.name === 'CanceledError') { //отмена нотификации при отмене запроса
+        return; 
+      }
       if (err instanceof Error) {
         openNotification({
           type: 'error',
@@ -187,9 +200,33 @@ const UsersPage = () => {
     }
   }
 
+
+  type TagRender = SelectProps['tagRender'];
+  
+  const tagRender: TagRender = (props) => {
+    const { label, closable, onClose } = props;
+    const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    console.log('LABEL: ', label)
+    return (
+      <Tag
+        color={roleColors[label.toLowerCase()]}
+        onMouseDown={onPreventMouseDown}
+        closable={closable}
+        onClose={onClose}
+        style={{ marginInlineEnd: 4 }}
+      >
+        {label}
+      </Tag>
+    );
+  };
+
   const columns: TableProps<User>['columns'] = [
     {
-      title: 'Имя пользователя',
+      title: 'Имя',
       dataIndex: 'username',
       key: 'username',
       render: (text) => <a>{text}</a>,
@@ -198,24 +235,29 @@ const UsersPage = () => {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      render: (email) => <div className={s.email}>
+        {/* <LetterIcon/> */}
+        {email}</div>,
     },
     {
       title: 'Дата регистрации',
       dataIndex: 'date',
       key: 'date',
-      width: 120,
+      width: 118,
       render: (dateString) => <>{getHumanDate(dateString)}</>,
     },
     {
       title: 'Статус блокировки',
       dataIndex: 'isBlocked',
       key: 'isBlocked',
-      width: 190,
-      render: (isBlocked, user) => <div>
+      width: 185,
+      render: (isBlocked, user) => <div className={s.block}>
         {isBlocked ? 'Заблокирован' : 'Незаблокирован'}
         <PermissionGuard userAction={PermissionAction.UserBlock}>
           <Button onClick={() => setBlockingUser(user)}>
-            {isBlocked ? 'Разблокировать' : 'Заблокировать'}
+            {/* {isBlocked ? 'Разблокировать' : 'Заблокировать'} */}
+            {isBlocked ? '+' : '-'}
+
           </Button>
         </PermissionGuard>
       </div>,
@@ -233,6 +275,7 @@ const UsersPage = () => {
               options={rolesOptions}
               style={{ width: '150px' }}
               // defaultValue={[...roles]}
+              tagRender={tagRender}
               value={rolesValue ?? roles}
               onChange={(value) => {
                 setRolesValue(value);
@@ -240,14 +283,23 @@ const UsersPage = () => {
               }}                          
             />
           </Form>
-        : roles.length > 1 ? <div>{roles.join(', ')}</div> : <div>{roles}</div>)
+        // : roles.length > 1 ? <div>{roles.join(', ')}</div> : <div>{roles}</div>)
+        : roles.map((role: RolesValues) => <Tag 
+            key={role} 
+            color={roleColors[role.toLowerCase()]} 
+            variant='solid'>
+              {role}
+            </Tag>))
       },
     },
     {
-      title: 'Phone',
+      title: 'Телефон',
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
-      width: 145,
+      width: 180,
+      render: (phone) => <div className={s.phone}>
+        {phone && <PhoneIcon/>}{getHumanPhone(phone)}
+      </div>,
     },
     {
       title: '',
