@@ -29,7 +29,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
   const [ editIsDone, setEditIsDone ] = useState<boolean>(isDone); //добавленное
 
   const { Item } = Form;
-  const [form] = Form.useForm();
+  const [ form ] = Form.useForm();
 
   useEffect(() => {
     const initialData = {isDone: isDone, title: title};

@@ -40,6 +40,9 @@ export const getClearAllValues = (params: Params) => { //!!! типизиров�
     if (key === 'isBlocked' && typeof value === 'boolean') {
       result[key] = value;
     }
+    if (typeof value === 'number') {
+      result[key] = value;
+    }
   }
 
   return result;

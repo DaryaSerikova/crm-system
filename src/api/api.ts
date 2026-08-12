@@ -145,6 +145,9 @@ export const getUsers = async (params: Params, controller: AbortController) => {
       params: params ,
       signal: controller.signal 
     });
+    console.log('getUsers, response: ', response);
+    console.log('getUsers, response.data: ', response.data);
+
     return response.data;
   } catch (err: unknown) {
     if (err instanceof Error) 
@@ -189,7 +192,9 @@ export const deleteUser = async (id: number): Promise<void> => {
 
 export const blockUser = async (id: number): Promise<void> => { //!!! todo: типы Promise<User>
   try {
-    await api.post(`/admin/users/${id}/block`);
+    console.log("block id: ", id);
+    const res = await api.post(`/admin/users/${id}/block`);
+    console.log('block res: ', res)
   } catch(err: unknown) {
     if (err instanceof Error) {
       throw new Error(`Failed to block user: ${err.message}`)

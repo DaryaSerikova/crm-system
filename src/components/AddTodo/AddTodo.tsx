@@ -1,6 +1,5 @@
 import type { TodoRequest } from '../../types/todo.types';
 import { Button, Form, Input, Flex } from 'antd';
-import { useForm } from 'antd/es/form/Form';
 import type { FormProps } from 'antd';
 import { createTodo } from '../../api/api';
 import { openNotification } from '@/utils/errors';
@@ -13,7 +12,7 @@ interface AddTodoProps {
 
 const AddTodo = ({ onUpdate }: AddTodoProps) => {
   const { Item } = Form;
-  const [ form ] = useForm();
+  const [ form ] = Form.useForm();
 
   type FieldType = {
     title?: string;

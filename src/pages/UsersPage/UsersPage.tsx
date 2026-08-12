@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router';
 import { Button, Table } from 'antd';
 import type { TableProps } from 'antd';
-import type { RolesValues, User } from '@/types/admin.types';
+import type { Params, RolesValues, User } from '@/types/admin.types';
 import { Roles } from '@/types/admin.types';
 import { getUsers, deleteUser, blockUser, unblockUser, changeUserRoles } from '@/api/api';
 import { setUsers } from '@/store/slices/adminSlice';
@@ -25,10 +25,17 @@ const UsersPage = () => {
   const [currentUsers, setCurrentUsers] = useState<User[] | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [blockingUser, setBlockingUser] = useState<User | null>(null);
-  const [qweryParams, setQweryParams] = useState({})
+  const [qweryParams, setQweryParams] = useState<Params>({});
 
   const [rolesValue, setRolesValue] = useState<RolesValues | null>(null);
   const [rolesUser, setRolesUser] = useState<User | null>(null);
+
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [totalUsers, setTotalUsers] = useState<number>(0); // Общее количество записей в базе данных
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const PAGE_SIZE = 20; 
+
 
   const {isAllowedAction: isAllowedRoles} = usePermission(PermissionAction.UserRoles);
 
@@ -39,7 +46,10 @@ const UsersPage = () => {
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const setAndFetchUsers = async (params = {}) => { //!!!подумать params {} или undefined null
+  const setAndFetchUsers = async (params = {}) => { //!!!подумать params {} или undefined 
+    // !!! не передан page
+    setLoading(true);
+
     try {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -51,9 +61,12 @@ const UsersPage = () => {
       const users = await getUsers(clearParams, controller); //!!!
 
       console.log('users: ', users);
-      dispatch(setUsers(users.data));
+      dispatch(setUsers(users.data)); //!!! (в setData то же самое ниже)
       setQweryParams(params);
-      setCurrentUsers(users.data);
+      setCurrentUsers(users.data); //setData это
+
+      // setData(users.data);         // !!! (в диспатче то же самое выше) Записываем массив данных
+      setTotalUsers(users.meta.totalAmount);   // Важно: бэкенд должен возвращать общее количество строк в БД
     } catch(err: unknown) {
       if (err instanceof Error) {
         openNotification({
@@ -62,8 +75,15 @@ const UsersPage = () => {
           description: 'Admin Users are failed'
         })
       }
+    } finally {
+      setLoading(false);
     }
   }
+
+  useEffect(() => {
+    setAndFetchUsers({...qweryParams, page: currentPage, limit: PAGE_SIZE}); 
+  }, [currentPage]);
+
   const postBlockUser = async (id: number) => {
     try {
       await blockUser(id);
@@ -123,13 +143,14 @@ const UsersPage = () => {
   const handleBlockUser = async (user: User | null) => { //!!! сломалось обновление? нет, не блокируется
     if (user) {
       const {isBlocked, id} = user;
-      if (isBlocked) {
+      if (isBlocked) { //isBlocked === true заблокирован, надо разбловировать
         console.log('UNBLOCK');
         await postUnblockUser(id);
         await setAndFetchUsers(qweryParams);
       } else {
         console.log('BLOCK')
         await postBlockUser(id);
+        console.log('block qweryParams: ', qweryParams);
         await setAndFetchUsers(qweryParams);
         setBlockingUser(null);
       }
@@ -221,7 +242,12 @@ const UsersPage = () => {
           </Form>
         : roles.length > 1 ? <div>{roles.join(', ')}</div> : <div>{roles}</div>)
       },
-        
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phoneNumber',
+      key: 'phoneNumber',
+      width: 145,
     },
     {
       title: '',
@@ -241,6 +267,11 @@ const UsersPage = () => {
     },
   ];
 
+  // Функция срабатывает при клике на номера страниц внизу таблицы
+  const handleTableChange = (pagination) => {
+    setCurrentPage(pagination.current);
+  };
+
   return (
     <div className={s.usersPage}>
       <h1 className={s.h1}> Пользователи </h1>
@@ -250,8 +281,19 @@ const UsersPage = () => {
       <Table<User> 
         columns={columns} 
         dataSource={currentUsers || []}
-        loading={currentUsers === null} 
+        // loading={currentUsers === null} 
         tableLayout="fixed"
+
+        //пагинация
+        // rowKey="id" // Укажите ваш уникальный ключ для строк
+        onChange={handleTableChange} // Срабатывает при клике на номера страниц
+        loading={loading}
+        pagination={{
+          current: currentPage,
+          pageSize: PAGE_SIZE,      //по 20 строк
+          total: totalUsers,        //всего юзеров
+          showSizeChanger: false,   // Скрывает динамический выбор (10, 20, 50)
+        }} 
       />
       {/* !!! Можно унифицировать количество передаваемых параметров ? */}
       <ConfirmModal 

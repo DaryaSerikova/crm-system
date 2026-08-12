@@ -54,8 +54,10 @@ export type RolesValues = `${Roles}`;
 export type PermissionActionValues = typeof PermissionAction[keyof typeof PermissionAction];
 
 export interface Params {
+  search?: string,
   sortBy?: 'username' | 'email' | 'id',
   sortOrder?: 'asc' | 'desc' | 'none',
-  search?: string,
-  isBlocked: boolean | 'all',
+  isBlocked?: boolean | 'all',
+  limit?: number,
+  page?: number,
 }
