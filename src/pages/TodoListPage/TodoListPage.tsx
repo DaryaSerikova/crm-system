@@ -38,16 +38,21 @@ const TodoListPage = () => {
 
   useEffect(() => {
     let timerId: ReturnType<typeof setTimeout>;
+    let isMounted = true;
   
     const autoFetch = async () => {
       await fetchAndSetTodos(listFilter);
-      timerId = setTimeout(autoFetch, 5000);
+
+      if (isMounted) {
+        timerId = setTimeout(autoFetch, 5000);
+      }
     };
   
     autoFetch();
   
     // Очистка при уходе со страницы/изменении фильтра
     return () => {
+      isMounted = false;
       if (timerId) clearTimeout(timerId);
     };
   }, [listFilter]);

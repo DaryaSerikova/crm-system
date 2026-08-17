@@ -1,24 +1,22 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { Link } from 'react-router';
-import { Button, Table, Tag } from 'antd';
+import { Button, Table } from 'antd';
 import type { TableProps } from 'antd';
 import type { Params, RolesValues, User } from '@/types/admin.types';
-import { Roles } from '@/types/admin.types';
 import { getUsers, deleteUser, blockUser, unblockUser, changeUserRoles } from '@/api/api';
 import { setUsers } from '@/store/slices/adminSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { getClearAllValues, getHumanDate, getHumanPhone } from '@/utils/utils';
+import { getClearAllValues, getHumanDate, getHumanPhone, deleteIdFromRoles } from '@/utils/utils';
 import { openNotification } from '@/utils/errors';
 import UserFilters from '@/components/UserFilters/UserFilters';
 import PermissionGuard from '@/components/PermissionGuard/PermissionGuard';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { PermissionAction } from '@/constants/permission';
 import s from './UsersPage.module.scss';
-import { Select, Form } from 'antd';
-import { usePermission } from '@/utils/hooks/usePermission';
 import axios from 'axios';
 import PhoneIcon from '@/assets/icons/PhoneIcon';
 import LetterIcon from '@/assets/icons/LetterIcon';
+import UserRoles from '@/components/UserRoles/UserRoles';
 
 
 
@@ -29,23 +27,18 @@ const UsersPage = () => {
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [blockingUser, setBlockingUser] = useState<User | null>(null);
   const [qweryParams, setQweryParams] = useState<Params>({});
+  const [sortParams, setSortParams] = useState({field: null, order: null});
 
   const [rolesValue, setRolesValue] = useState<RolesValues | null>(null);
   const [rolesUser, setRolesUser] = useState<User | null>(null);
-
+  const [currentRolesFormIds, setCurrentRolesFormIds] = useState<number[]>([]);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [totalUsers, setTotalUsers] = useState<number>(0); // Общее количество записей в базе данных
   const [currentPage, setCurrentPage] = useState<number>(1);
   const PAGE_SIZE = 20; 
+  // const PAGE_SIZE = 5; 
 
-  const {isAllowedAction: isAllowedRoles} = usePermission(PermissionAction.UserRoles);
-
-  const roleColors = {
-    user: 'purple',
-    admin: 'blue',
-    moderator: 'orange',
-  }
 
   const user = useAppSelector(state => state.user);
   useEffect(() => {
@@ -65,6 +58,7 @@ const UsersPage = () => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
+      console.log('params: ', params)
       const clearParams = getClearAllValues(params);
       const users = await getUsers(clearParams, controller); //!!!
 
@@ -94,8 +88,12 @@ const UsersPage = () => {
   }
 
   useEffect(() => {
-    setAndFetchUsers({...qweryParams, page: currentPage, limit: PAGE_SIZE}); 
-  }, [currentPage]);
+    setAndFetchUsers({
+      ...qweryParams, 
+      page: currentPage, 
+      limit: PAGE_SIZE
+    }); 
+  }, [currentPage, sortParams]);
 
   const postBlockUser = async (id: number) => {
     try {
@@ -153,41 +151,35 @@ const UsersPage = () => {
       }
     }
   };
-  const handleBlockUser = async (user: User | null) => { //!!! сломалось обновление? нет, не блокируется
+  const handleBlockUser = async (user: User | null) => {
     if (user) {
       const {isBlocked, id} = user;
-      if (isBlocked) { //isBlocked === true заблокирован, надо разбловировать
-        console.log('UNBLOCK');
+      if (isBlocked) {
         await postUnblockUser(id);
         await setAndFetchUsers(qweryParams);
+        setBlockingUser(null);
       } else {
-        console.log('BLOCK')
         await postBlockUser(id);
-        console.log('block qweryParams: ', qweryParams);
         await setAndFetchUsers(qweryParams);
         setBlockingUser(null);
       }
     }
   }
-
-  const rolesOptions = Object.values(Roles).map(
-    (item) => ({value: item, label: item})
-  );
   
   const handleChangeRoles = async (user: User | null, newRoles: RolesValues | null) => {
     console.log('value newRoles: ', newRoles); //newRoles //value
     
     if (user) { //!!! ???
       try {
-          await changeUserRoles(user.id, newRoles); 
-          await setAndFetchUsers(qweryParams);
-          setRolesValue(null);
+        await changeUserRoles(user.id, newRoles); 
+        await setAndFetchUsers(qweryParams);
+        setRolesValue(null);
 
-          openNotification({
-            type: 'success',
-            title: 'SUCCESS',
-            description: `Admin: user ${user.id} rights (roles) were changed` 
-          })
+        openNotification({
+          type: 'success',
+          title: 'SUCCESS',
+          description: `Admin: user ${user.id} rights (roles) were changed` 
+        })
       } catch (err: unknown) {
         if (err instanceof Error) {
           openNotification({
@@ -196,45 +188,31 @@ const UsersPage = () => {
             description: `Admin: user ${user.id} rights (roles) were not changed` 
           })
         }
+      } finally {
+        deleteIdFromRoles(user, currentRolesFormIds, setCurrentRolesFormIds);
       }
     }
   }
 
-
-  type TagRender = SelectProps['tagRender'];
-  
-  const tagRender: TagRender = (props) => {
-    const { label, closable, onClose } = props;
-    const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-    };
-
-    console.log('LABEL: ', label)
-    return (
-      <Tag
-        color={roleColors[label.toLowerCase()]}
-        onMouseDown={onPreventMouseDown}
-        closable={closable}
-        onClose={onClose}
-        style={{ marginInlineEnd: 4 }}
-      >
-        {label}
-      </Tag>
-    );
-  };
-
-  const columns: TableProps<User>['columns'] = [
+  const columns: TableProps<User>['columns'] = useMemo(() => [
+    {
+      title: 'id',
+      dataIndex: 'id',
+      key: 'id',
+    },
     {
       title: 'Имя',
       dataIndex: 'username',
       key: 'username',
-      render: (text) => <a>{text}</a>,
+      sorter: true, // Включает сортировку на бэкенде для этой колонки
+      sortOrder: sortParams.field === 'username' ? sortParams.order : undefined, // Управляет подсветкой стрелочек
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      sorter: true, // Включает сортировку на бэкенде для этой колонки
+      sortOrder: sortParams.field === 'email' ? sortParams.order : undefined, // Управляет подсветкой стрелочек
       render: (email) => <div className={s.email}>
         {/* <LetterIcon/> */}
         {email}</div>,
@@ -267,39 +245,25 @@ const UsersPage = () => {
       dataIndex: 'roles',
       key: 'roles',
       width: 160,
-      render: (roles, user) => {
-        return (isAllowedRoles 
-        ? <Form>
-            <Select 
-              mode="multiple"
-              options={rolesOptions}
-              style={{ width: '150px' }}
-              // defaultValue={[...roles]}
-              tagRender={tagRender}
-              value={rolesValue ?? roles}
-              onChange={(value) => {
-                setRolesValue(value);
-                setRolesUser(user);
-              }}                          
-            />
-          </Form>
-        // : roles.length > 1 ? <div>{roles.join(', ')}</div> : <div>{roles}</div>)
-        : roles.map((role: RolesValues) => <Tag 
-            key={role} 
-            color={roleColors[role.toLowerCase()]} 
-            variant='solid'>
-              {role}
-            </Tag>))
-      },
+      render: (roles, user) => (
+        <UserRoles 
+          roles={roles}
+          user={user}
+          currentRolesFormIds={currentRolesFormIds}
+          setRolesValue={setRolesValue} 
+          setRolesUser={setRolesUser}
+          setCurrentRolesFormIds={setCurrentRolesFormIds}
+        />)
     },
     {
       title: 'Телефон',
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
       width: 180,
-      render: (phone) => <div className={s.phone}>
-        {phone && <PhoneIcon/>}{getHumanPhone(phone)}
-      </div>,
+      render: (phone) => (
+        <div className={s.phone}>
+          {phone && <PhoneIcon/>}{getHumanPhone(phone)}
+        </div>),
     },
     {
       title: '',
@@ -308,7 +272,7 @@ const UsersPage = () => {
       width: 130,
       render: (_, record ) => <div>
         <Link to={`/users/${record.id}`}>
-          <Button>Перейти</Button>
+          <Button>Профиль</Button>
         </Link>
         <PermissionGuard userAction={PermissionAction.UserDelete}>
           <Button onClick={() => setDeletingUser(record)}>
@@ -317,11 +281,32 @@ const UsersPage = () => {
         </PermissionGuard>
       </div>
     },
-  ];
+  ], [sortParams.field, sortParams.order, currentRolesFormIds]);
 
   // Функция срабатывает при клике на номера страниц внизу таблицы
-  const handleTableChange = (pagination) => {
+  const handleTableChange = (...args) => {
+    const [pagination, , sorter] = args; //pagination, filters, sorter, служебный объект
+
     setCurrentPage(pagination.current);
+    setSortParams({
+      field: sorter.field,
+      order: sorter.order
+    });
+    const getRightFormOrder = (order) => {
+      console.log('order: ', order)
+      if (order === 'ascend') {
+        return 'asc';
+      } 
+      if (order === 'descend') {
+        return 'desc';
+      }
+      return undefined;
+      // return 'none';
+    }
+    setQweryParams({...qweryParams, 
+      sortBy: sorter.field ?? 'id', 
+      sortOrder: getRightFormOrder(sorter.order),
+    })
   };
 
   return (
@@ -337,13 +322,12 @@ const UsersPage = () => {
         tableLayout="fixed"
 
         //пагинация
-        // rowKey="id" // Укажите ваш уникальный ключ для строк
         onChange={handleTableChange} // Срабатывает при клике на номера страниц
         loading={loading}
         pagination={{
           current: currentPage,
-          pageSize: PAGE_SIZE,      //по 20 строк
-          total: totalUsers,        //всего юзеров
+          pageSize: PAGE_SIZE,
+          total: totalUsers,
           showSizeChanger: false,   // Скрывает динамический выбор (10, 20, 50)
         }} 
       />

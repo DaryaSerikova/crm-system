@@ -1,4 +1,4 @@
-import { Select, Input, Form, Row, Col } from 'antd';
+import { Select, Input, Form, } from 'antd';
 import type { Params } from '@/types/admin.types';
 import { useDebounceCallback } from '@/utils/hooks/useDebounceCallback';
 import s from './UserFilters.module.scss';
@@ -32,15 +32,11 @@ const UserFilters = ({setAndFetchUsers}: UserFiltersProps) => {
     <div className={s.userFilters}>
     <Form
       name="basic"
-      initialValues={{ 
-        // sortBy?: null;
-        // sortOrder?: null;
-        // search?: '';
-      }}
+      initialValues={{}}
       layout="vertical"
       onValuesChange={handleValuesChange}
     >
-      <Row gutter={[16, 16]} align="bottom">
+      {/* <Row gutter={[16, 16]} align="bottom">
         <Col xs={24} sm={12}>
           <Item<Params>
             label="Cортировка по имени/email/id"
@@ -71,7 +67,8 @@ const UserFilters = ({setAndFetchUsers}: UserFiltersProps) => {
             />
           </Item>
         </Col>
-      </Row>
+      </Row> */}
+
       <PermissionGuard userAction={PermissionAction.UserBlockFilter}>
         <Item
         name="isBlocked"
@@ -79,6 +76,7 @@ const UserFilters = ({setAndFetchUsers}: UserFiltersProps) => {
         >
           <Select
             defaultValue='Все'
+            style={{width:  '150px'}}
             options={[
               { value: true, label: 'Заблокированые' },
               { value: false, label: 'Активные' },

@@ -64,10 +64,17 @@ const UserPage = () => {
       setIsEdit(false);
       return;
     }
+    let changedValues = {};
+    for (const field in values) {
+      if(values[field] !== currentUser[field]) {
+        changedValues[field] = values[field];
+      }
+    }
 
     if(id){
       try{
-        const response = await editUser(+id, values);
+        // const response = await editUser(+id, values);
+        const response = await editUser(+id, changedValues);
         console.log('res edit: ', response);
         setCurrentUser(response ?? null);
         setIsEdit(false);
@@ -94,11 +101,11 @@ const UserPage = () => {
       <h1 className={s.h1}>User {id}</h1>
       <section className={s.section}>
         {isLoading && <p>isLoading ...</p>}
-        {!isLoading && currentUser && !isEdit && <>
-          <p>{currentUser?.username}</p>
-          <p>{currentUser?.email}</p>
-          <p>{currentUser?.phoneNumber}</p>
-        </>}
+        {!isLoading && currentUser && !isEdit && <div className={s.info}>
+          <p className={s.fieldName}>Имя:</p><p>{currentUser?.username}</p>
+          <p className={s.fieldName}>Email: </p><p>{currentUser?.email}</p>
+          <p className={s.fieldName}>Телефон: </p><p>{currentUser?.phoneNumber}</p>
+        </div>}
         {!isEdit && <PermissionGuard userAction={PermissionAction.UserEdit}>
           <Button onClick={() => setIsEdit(true)}>
             Редактировать
@@ -148,7 +155,8 @@ const UserPage = () => {
         </Form>}
 
         <Link to={'/users'}>
-          <Button>К таблице пользователей</Button>
+          {/* <Button>К таблице пользователей</Button> */}
+          <Button>Вернуться</Button>
         </Link>
       </section>
     </div>

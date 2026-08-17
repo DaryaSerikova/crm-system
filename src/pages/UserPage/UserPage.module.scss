@@ -5,6 +5,18 @@
 
   .h1, .section {
     margin-left: 25px;
+
+    .info {
+      display: grid;
+      grid-template-columns: 80px 80px;
+      grid-template-rows: repeat(3, 30px);
+
+      margin-bottom: 25px;
+
+      .fieldName {
+        font-weight: 600;
+      }
+    }
   }
 
   

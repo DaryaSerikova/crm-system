@@ -52,3 +52,11 @@ export const getClearAllValues = (params: Params) => { //!!! типизиров�
 
   return result;
 }
+
+export const deleteIdFromRoles = (user, currentIds, setCurrentIds) => {
+  const userIndex = currentIds.indexOf(user.id);
+  setCurrentIds([
+    ...currentIds.slice(0, userIndex),
+    ...currentIds.slice(userIndex + 1) 
+  ])
+}
