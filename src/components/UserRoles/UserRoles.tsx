@@ -5,11 +5,17 @@ import { PermissionAction } from '@/constants/permission';
 import type { RolesValues, User } from '@/types/admin.types';
 import { Roles } from '@/types/admin.types';
 import { deleteIdFromRoles } from '@/utils/utils';
+import type { SelectProps } from 'antd';
 
 
 type TagRender = SelectProps['tagRender'];
+type RoleColors = {
+  user: string,
+  admin: string,
+  moderator: string,
+}
 
-const roleColors = {
+const roleColors: RoleColors = {
   user: 'purple',
   admin: 'blue',
   moderator: 'orange',
@@ -22,9 +28,12 @@ const tagRender: TagRender = (props) => {
     event.stopPropagation();
   };
 
+  const labelStr = typeof label === 'string' ? label : String(label);
+  const key = labelStr.toLowerCase() as keyof RoleColors;
+
   return (
     <Tag
-      color={roleColors[label.toLowerCase()]}
+      color={roleColors[key]}
       onMouseDown={onPreventMouseDown}
       closable={closable}
       onClose={onClose}
@@ -37,7 +46,7 @@ const tagRender: TagRender = (props) => {
 
 interface UserRolesProps {
   user: User,
-  roles: RolesValues,
+  roles: RolesValues[],
   currentRolesFormIds: number[],
   setCurrentRolesFormIds: React.Dispatch<SetStateAction<number[]>>,
   setRolesValue: React.Dispatch<SetStateAction<RolesValues | null>>,
@@ -85,14 +94,19 @@ const UserRoles = ({
       >Отмена</Button>
     </Form>
   : <>
-  {roles.map((role: RolesValues) => 
-    <Tag 
-      key={role} 
-      color={roleColors[role.toLowerCase()]} 
-      variant='solid'
-    >
-      {role}
-    </Tag>
+  {roles.map((role: RolesValues) => {
+    const key = role.toLowerCase() as keyof RoleColors;
+    return(
+      <Tag 
+        key={role} 
+        color={roleColors[key]} 
+        // variant='solid'
+      >
+        {role}
+      </Tag>
+    )
+  }
+
   )}
   <Button onClick={() => 
     setCurrentRolesFormIds([

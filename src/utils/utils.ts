@@ -1,4 +1,5 @@
-import type { Params } from "@/types/admin.types";
+import type { Params, User } from "@/types/admin.types";
+import type { SetStateAction } from "react";
 
 export const getValidationMessage = (str: string): string => {
 
@@ -31,29 +32,65 @@ export const getHumanDate = (dateString: string) => {
   })
 }
 
-export   const getHumanPhone = (phone) => 
+export const getHumanPhone = (phone: string) => 
   phone 
     ? `${phone.slice(0,2)} (${phone.slice(2,5)}) ${phone.slice(5,8)}-${phone.slice(8)}`
     : '';
 
 export const getClearAllValues = (params: Params) => { //!!! типизировать
-  const result: Params = {};
-  for (let [key, value] of Object.entries(params) as [keyof Params, Params[keyof Params]][] ) {
-    if (key !== 'isBlocked' && typeof value === 'string' && !!value?.trim()) {
-      result[key] = value?.trim() as Params[keyof Params];
+  const result: Partial<Record<keyof Params, Params[keyof Params]>> = {};
+  // const result: Params = {};
+  
+  
+  for (let [key, value] of Object.entries(params)) {
+    const paramKey = key as keyof Params;
+
+    switch (paramKey) {
+      case 'search':
+      case 'sortBy':
+      case 'sortOrder':
+        if (typeof value === 'string') {
+          const isExist = !!value.trim();
+          if (isExist) {
+            result[paramKey] = value;
+          }
+        }
+        break;
+
+      case 'isBlocked':
+        if (typeof value === 'boolean') {
+          result[paramKey] = value;
+        }
+        break;
+
+      case 'limit':
+      case 'page':
+        if (typeof value === 'number') {
+          result[paramKey] = value;
+        }
+        break;
+      
+      default: 
+        return;
     }
-    if (key === 'isBlocked' && typeof value === 'boolean') {
-      result[key] = value;
-    }
-    if (typeof value === 'number') {
-      result[key] = value;
-    }
+  
+    // if (paramKey !== 'isBlocked' && typeof value === 'string'  && !!value?.trim()) {
+    //   result[paramKey] = value?.trim();
+    // }
+    // if (paramKey === 'isBlocked' && typeof value === 'boolean') {
+    //   result[paramKey] = value;
+    // }
+    // if (typeof value === 'number') {
+    //   result[paramKey] = value;
+    // }
   }
 
-  return result;
+  return result as Params;
 }
 
-export const deleteIdFromRoles = (user, currentIds, setCurrentIds) => {
+export const deleteIdFromRoles = (
+  user: User, currentIds: number[], setCurrentIds: React.Dispatch<SetStateAction<number[]>>
+) => {
   const userIndex = currentIds.indexOf(user.id);
   setCurrentIds([
     ...currentIds.slice(0, userIndex),

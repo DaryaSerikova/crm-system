@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router';
 import { getUser } from '../../api/api';
-import type { User } from '../../types/admin.types';
+import type { User, UserRequest } from '../../types/admin.types';
 import { openNotification } from '@/utils/errors';
 import { Link } from 'react-router';
 import type { FormProps } from 'antd';
@@ -55,7 +55,7 @@ const UserPage = () => {
     }
   }, []);
 
-  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values: UserRequest) => {
     console.log('Success:', values);
 
     if (values.username === currentUser?.username 
@@ -64,10 +64,14 @@ const UserPage = () => {
       setIsEdit(false);
       return;
     }
-    let changedValues = {};
+    // let changedValues = {} as Partial<Record<keyof UserRequest, UserRequest[keyof UserRequest]>>;
+    let changedValues: UserRequest = {};
+
     for (const field in values) {
-      if(values[field] !== currentUser[field]) {
-        changedValues[field] = values[field];
+      const key = field as keyof UserRequest;
+
+      if(values[key] !== currentUser?.[key]) {
+        changedValues[key] = values[key];
       }
     }
 

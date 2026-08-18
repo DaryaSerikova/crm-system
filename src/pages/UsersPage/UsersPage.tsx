@@ -15,7 +15,7 @@ import { PermissionAction } from '@/constants/permission';
 import s from './UsersPage.module.scss';
 import axios from 'axios';
 import PhoneIcon from '@/assets/icons/PhoneIcon';
-import LetterIcon from '@/assets/icons/LetterIcon';
+// import LetterIcon from '@/assets/icons/LetterIcon';
 import UserRoles from '@/components/UserRoles/UserRoles';
 
 
@@ -59,7 +59,7 @@ const UsersPage = () => {
       abortControllerRef.current = controller;
 
       console.log('params: ', params)
-      const clearParams = getClearAllValues(params);
+      const clearParams: Params = getClearAllValues(params) ?? {};
       const users = await getUsers(clearParams, controller); //!!!
 
       console.log('users: ', users);
@@ -70,12 +70,12 @@ const UsersPage = () => {
       // setData(users.data);         // !!! (в диспатче то же самое выше) Записываем массив данных
       setTotalUsers(users.meta.totalAmount);   // Важно: бэкенд должен возвращать общее количество строк в БД
     } catch(err: unknown) {
-
-      console.log('setAndFetchUsers | axios.isCancel(err): ', axios.isCancel(err))
-      if (axios.isCancel(err) || err?.name === 'CanceledError') { //отмена нотификации при отмене запроса
-        return; 
-      }
       if (err instanceof Error) {
+        console.log('setAndFetchUsers | axios.isCancel(err): ', axios.isCancel(err))
+        if (axios.isCancel(err) || err?.name === 'CanceledError') { //отмена нотификации при отмене запроса
+          return; 
+        }
+
         openNotification({
           type: 'error',
           title: 'ERROR',
@@ -284,7 +284,7 @@ const UsersPage = () => {
   ], [sortParams.field, sortParams.order, currentRolesFormIds]);
 
   // Функция срабатывает при клике на номера страниц внизу таблицы
-  const handleTableChange = (...args) => {
+  const handleTableChange = (...args: any[]) => {
     const [pagination, , sorter] = args; //pagination, filters, sorter, служебный объект
 
     setCurrentPage(pagination.current);
@@ -292,7 +292,8 @@ const UsersPage = () => {
       field: sorter.field,
       order: sorter.order
     });
-    const getRightFormOrder = (order) => {
+
+    const getRightFormOrder = (order: 'ascend' | 'descend') => {
       console.log('order: ', order)
       if (order === 'ascend') {
         return 'asc';

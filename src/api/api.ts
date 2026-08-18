@@ -5,6 +5,7 @@ import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
 import { accessTokenManager } from "@/store/tokenStorage";
 import type { Params, User, UserRequest } from "@/types/admin.types";
+import type { InternalAxiosRequestConfig } from "axios";
 
 const baseUrl = 'https://easydev.club/api/v1';
 const api = axios.create({
@@ -22,33 +23,39 @@ const handleUnauthorizedError = async (error: AxiosError) => {
     return Promise.reject(error);
   }
 
-  const originalRequest = error.config;
-  const isUnauthorized = error.response?.status === 401;
-  const isRetry = originalRequest._isRetry;
-
-  if (isUnauthorized && !isRetry) {
-    originalRequest._isRetry = true;
-    const oldRefreshToken = localStorage.getItem('refreshToken');
-
-    try {
-      const res = await axios.post(`${baseUrl}/auth/refresh`, {refreshToken: oldRefreshToken});
-      const { accessToken, refreshToken } = res.data; //new tokens
-
-      localStorage.setItem('refreshToken', refreshToken);
-      store.dispatch(setAuth(accessToken));
-
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-      return api(originalRequest);
-    } catch (refreshError) {
-      console.log('REFRESH ERROR')
-      store.dispatch(removeAuth()); //logout
-      localStorage.removeItem('refreshToken');
-
-      return Promise.reject(refreshError);
-    }
+  interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+    _isRetry?: boolean; // Добавляем наше кастомное свойство
   }
+  const originalRequest = error.config as CustomAxiosRequestConfig;;
 
-  return Promise.reject(error);
+  if (originalRequest) {
+    const isUnauthorized = error.response?.status === 401;
+    const isRetry = originalRequest._isRetry;
+  
+    if (isUnauthorized && !isRetry) {
+      originalRequest._isRetry = true;
+      const oldRefreshToken = localStorage.getItem('refreshToken');
+  
+      try {
+        const res = await axios.post(`${baseUrl}/auth/refresh`, {refreshToken: oldRefreshToken});
+        const { accessToken, refreshToken } = res.data; //new tokens
+  
+        localStorage.setItem('refreshToken', refreshToken);
+        store.dispatch(setAuth(accessToken));
+  
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.log('REFRESH ERROR')
+        store.dispatch(removeAuth()); //logout
+        localStorage.removeItem('refreshToken');
+  
+        return Promise.reject(refreshError);
+      }
+    }
+  
+    return Promise.reject(error);
+  }
 }
 
 api.interceptors.request.use((config) => { //перед запросом
@@ -162,13 +169,15 @@ export const getUsers = async (params: Params, controller: AbortController) => {
 
     return response.data;
   } catch (err: unknown) {
-    if (err instanceof Error) 
+    if (err instanceof Error) {
 
-    console.log('axios.isCancel(err): ',axios.isCancel(err))
-    if (axios.isCancel(err)) {
-      throw err;
+      console.log('axios.isCancel(err): ', axios.isCancel(err))
+      if (axios.isCancel(err)) {
+        throw err;
+      }
+      throw new Error(`Failed to get users for admin: ${err.message}`);
     }
-    throw new Error(`Failed to get users for admin: ${err.message}`);
+
   }
 }
 

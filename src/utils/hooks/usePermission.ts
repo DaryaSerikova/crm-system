@@ -8,7 +8,10 @@ export const usePermission = (userAction = 'user.view') => {
   const allowedRoles = PERMISSIONS_MAP[userAction as PermissionActionValues];
   let isAllowedAction = null;
 
-  if(user.roles === null) {
+  
+  const userRoles = user.roles as RolesValues | null;
+
+  if(userRoles === null) {
     return { isAllowedAction: false };
   }
 
@@ -17,10 +20,10 @@ export const usePermission = (userAction = 'user.view') => {
 
     if (Array.isArray(_allowedRoles)) {
       const res = _allowedRoles.some((allowedRole) => 
-        user.roles?.includes(allowedRole));
+        userRoles?.includes(allowedRole));
       return res;
     }
-    return user.roles === _allowedRoles;
+    return userRoles === _allowedRoles;
   };
 
   isAllowedAction = hasRole(allowedRoles);
