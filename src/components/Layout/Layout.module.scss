@@ -3,9 +3,12 @@
 //rgba(0, 0, 0, 1)
 
 .sidebar {
-  max-width: 248px;
+  // max-width: 248px;
+  width: var(--sidebar-width);
   height: 100vh;
-  position: sticky;
+  // position: sticky;
+  position: fixed;
+
   display: flex;
   flex-direction: column;
   z-index: 10;

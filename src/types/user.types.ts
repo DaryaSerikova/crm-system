@@ -18,6 +18,8 @@ export interface Profile {
 	phoneNumber: string; 
 }
 
+
+
 export interface AuthData { 
   login: string; 
   password: string; 

@@ -29,7 +29,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
   const [ editIsDone, setEditIsDone ] = useState<boolean>(isDone); //добавленное
 
   const { Item } = Form;
-  const [form] = Form.useForm();
+  const [ form ] = Form.useForm();
 
   useEffect(() => {
     const initialData = {isDone: isDone, title: title};
@@ -65,10 +65,7 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
       }
     }
   };
-  
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo); //handleSubmitEditedTodo
-  };
+
 
   const onChangeEditCheckbox: CheckboxProps['onChange'] = (e) => { //checkbox
     setEditIsDone(e.target.checked);
@@ -132,7 +129,6 @@ const TodoItem = ({ todo, listFilter, onUpdate }: TodoProps) => {
         name="edit-todo"
         initialValues={{isDone: editIsDone, title: title}}
         onFinish={handleSubmitEditedTodo}
-        onFinishFailed={onFinishFailed}
         style={{width: '100%'}}
       >
         <Row justify="space-between" gutter={10}>

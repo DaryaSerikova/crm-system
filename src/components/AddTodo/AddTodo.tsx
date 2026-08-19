@@ -1,6 +1,5 @@
 import type { TodoRequest } from '../../types/todo.types';
 import { Button, Form, Input, Flex } from 'antd';
-import { useForm } from 'antd/es/form/Form';
 import type { FormProps } from 'antd';
 import { createTodo } from '../../api/api';
 import { openNotification } from '@/utils/errors';
@@ -13,7 +12,7 @@ interface AddTodoProps {
 
 const AddTodo = ({ onUpdate }: AddTodoProps) => {
   const { Item } = Form;
-  const [ form ] = useForm();
+  const [ form ] = Form.useForm();
 
   type FieldType = {
     title?: string;
@@ -41,16 +40,11 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
     }
   };
   
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('onFinishFailed Failed:', errorInfo);
-  };
-  
   return (
     <Form
       form={form}
       name="add-todo"
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
     >
       <Flex gap={10} align="center">
         <Item<FieldType>

@@ -1,5 +1,9 @@
 .todoListPage {
-  width: 100%;
+  // width: 100%;
+
+  margin-left: var(--sidebar-width);
+  width: 100% - var(--sidebar-width);
+
   height: 100%;
   display: flex;
   flex-direction: column;

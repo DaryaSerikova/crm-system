@@ -48,10 +48,6 @@ const LoginPage = () => {
       }
     }
   };
-  
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
 
   return (
     <div className={s.login}>
@@ -65,7 +61,6 @@ const LoginPage = () => {
           className={s.loginForm}
           name="login"
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
           initialValues={{
             login: "",
             password: "",

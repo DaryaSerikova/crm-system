@@ -1,0 +1,27 @@
+.usersPage {
+  margin: 25px 0;
+  margin-left: var(--sidebar-width);
+  width: 100% - var(--sidebar-width);
+
+  .h1{
+    margin-left: 25px;
+  }
+
+  // .email 
+  .phone {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+
+    &:first-child {
+      align-items: center;
+    }
+  }
+
+  .block {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

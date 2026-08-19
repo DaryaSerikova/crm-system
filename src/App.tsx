@@ -8,6 +8,8 @@ import { ProtectedAuth } from './components/ProtectedAuth/ProtectedAuth';
 import ThemeProvider from './components/ThemeProvider/ThemeProvider';
 import s from './App.module.scss';
 import LayoutAuth from './components/LayoutAuth/LayoutAuth';
+import UsersPage from './pages/UsersPage/UsersPage';
+import UserPage from './pages/UserPage/UserPage';
 
 
 
@@ -22,6 +24,9 @@ function App() {
             <Route path="/" element={<Layout/>}>
               <Route path="/" element={<TodoListPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/users/:id" element={<UserPage />} />
+
             </Route>
           </Route>
 

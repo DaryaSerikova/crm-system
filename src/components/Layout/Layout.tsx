@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import type { Profile } from '@/types/user.types';
-import type { MenuProps } from 'antd';
 import { Outlet, useNavigate } from 'react-router';
 import { useAppDispatch } from '@/store/hooks';
 import { removeAuth } from '@/store/slices/authSlice';
@@ -12,14 +11,16 @@ import LogoIcon from '@/assets/icons/LogoIcon';
 import { openNotification } from '@/utils/errors';
 import { getUserProfile } from '@/api/api';
 import s from './Layout.module.scss';
+import { usePermission } from '@/utils/hooks/usePermission';
+import { PermissionAction } from '@/constants/permission';
 
 
-type MenuItem = Required<MenuProps>['items'][number];
+type MenuItem = {
+  key: string, 
+  label: string, 
+  isShow: boolean,
+}
 
-const items: MenuItem[] = [
-  { key: '/', label: 'Список задач' },
-  { key: '/profile', label: 'Профиль' },
-]
 
 const Layout = () => {
   const [userProfile, setUserProfile] = useState<Profile | undefined>({} as Profile | undefined)
@@ -27,6 +28,25 @@ const Layout = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const {isAllowedAction: isAllowedShow} = usePermission(PermissionAction.UserView);
+
+  const items: MenuItem[] = [
+    { 
+      key: '/', 
+      label: 'Список задач',
+      isShow: true, 
+    },
+    { 
+      key: '/profile', 
+      label: 'Профиль',
+      isShow: true, 
+    },
+    { 
+      key: '/users', 
+      label: 'Пользователи', 
+      isShow: isAllowedShow,  
+    },
+  ]
 
   const fetchAndSetUserProfile = async () => {
     try {
@@ -57,6 +77,9 @@ const Layout = () => {
     localStorage.removeItem('refreshToken');
   }
 
+  const allowedMenuItems = items.filter((menuItem) => 
+    menuItem.isShow === true || menuItem.isShow === null);
+
   return (
     <>
       <div className={s.sidebar}>
@@ -70,7 +93,7 @@ const Layout = () => {
             defaultSelectedKeys={[window.location.pathname]}
             defaultOpenKeys={['sub1']}
             mode="inline"
-            items={items}
+            items={allowedMenuItems}
             style={{ borderRight: 'none' }} 
           />
           <div className={s.userLogout}>
