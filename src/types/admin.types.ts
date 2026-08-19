@@ -1,14 +1,5 @@
 import type { PermissionAction } from "@/constants/permission";
 
-// // Интерфейс запроса для фильтрации и сортировки пользователей
-// interface UserFilters { 
-//   search?: string;
-//   sortBy?: string;
-//   sortOrder?: 'asc' | 'desc';
-//   isBlocked?: boolean;
-//   limit?: number;  // сколько на странице
-//   page?: number;  // страницу
-// }
 
 // Интерфейс пользователя
 export interface User {
@@ -20,21 +11,19 @@ export interface User {
   roles: Roles[]; 
   phoneNumber: string;
 }
-// // Интерфейс метаинформации
+// Интерфейс метаинформации
 
-// interface MetaResponse<T> { 
-//   data: T[]
-//   meta: {   
-//     totalAmount: number;   
-//     sortBy: string;   
-//     sortOrder: 'asc' | 'desc'; 
-//   }
-// }
-// // Интерфейс для обновления прав пользователя
+export interface MetaResponse<T> { 
+  data: T[]
+  meta: {   
+    totalAmount: number;   
+    sortBy: string;   
+    sortOrder: 'asc' | 'desc'; 
+  }
+}
+// Интерфейс для обновления прав пользователя
 export interface UserRolesRequest {  
-  roles: Roles []  // при вызове этой апи роли будут обновлены к тому массиву который будет передан
-// например если у вас была roles: ['ADMIN'] а вы хотите добавить ['MODERATOR'] то нужно передавать 
-// старые + новые - roles: ['ADMIN', 'MODERATOR'] 
+  roles: Roles[]
 }
 
 // Интерфейс для обновления данных пользователя
@@ -49,9 +38,20 @@ export enum Roles {
   MODERATOR = "MODERATOR",
   USER = "USER",
 }
+
 // type RolesValues = typeof Roles [keyof typeof Roles];
 export type RolesValues = `${Roles}`;
 export type PermissionActionValues = typeof PermissionAction[keyof typeof PermissionAction];
+
+// // Интерфейс запроса для фильтрации и сортировки пользователей
+// interface UserFilters { 
+//   search?: string;
+//   sortBy?: string;
+//   sortOrder?: 'asc' | 'desc';
+//   isBlocked?: boolean;
+//   limit?: number;  // сколько на странице
+//   page?: number;  // страницу
+// }
 
 export interface Params {
   search?: string,

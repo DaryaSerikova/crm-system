@@ -1,25 +1,28 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { Link } from 'react-router';
+import axios from 'axios';
 import { Button, Table } from 'antd';
-import type { TableProps } from 'antd';
+import type { TableProps, TablePaginationConfig } from 'antd';
+import type { FilterValue, SorterResult, SortOrder, Key } from 'antd/es/table/interface';
 import type { Params, RolesValues, User } from '@/types/admin.types';
-import { getUsers, deleteUser, blockUser, unblockUser, changeUserRoles } from '@/api/api';
 import { setUsers } from '@/store/slices/adminSlice';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { getClearAllValues, getHumanDate, getHumanPhone, deleteIdFromRoles } from '@/utils/utils';
-import { openNotification } from '@/utils/errors';
+import { useAppDispatch } from '@/store/hooks';
 import UserFilters from '@/components/UserFilters/UserFilters';
 import PermissionGuard from '@/components/PermissionGuard/PermissionGuard';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
-import { PermissionAction } from '@/constants/permission';
-import s from './UsersPage.module.scss';
-import axios from 'axios';
-import PhoneIcon from '@/assets/icons/PhoneIcon';
-// import LetterIcon from '@/assets/icons/LetterIcon';
 import UserRoles from '@/components/UserRoles/UserRoles';
+import { getUsers, deleteUser, blockUser, unblockUser, changeUserRoles } from '@/api/api';
+import { getClearAllValues, getHumanDate, getHumanPhone, deleteIdFromRoles } from '@/utils/utils';
+import { openNotification } from '@/utils/errors';
+import { PermissionAction } from '@/constants/permission';
+import PhoneIcon from '@/assets/icons/PhoneIcon';
+import s from './UsersPage.module.scss';
 
 
-
+type SortParams = {
+  field: Key | readonly Key[] | undefined;
+  order: SortOrder | undefined;
+}
 
 const UsersPage = () => {
   const dispatch = useAppDispatch();
@@ -27,28 +30,22 @@ const UsersPage = () => {
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [blockingUser, setBlockingUser] = useState<User | null>(null);
   const [qweryParams, setQweryParams] = useState<Params>({});
-  const [sortParams, setSortParams] = useState({field: null, order: null});
+  const [sortParams, setSortParams] = useState<SortParams>({field: undefined, order: undefined});
 
-  const [rolesValue, setRolesValue] = useState<RolesValues | null>(null);
+  const [rolesValue, setRolesValue] = useState<RolesValues[]>([]);
   const [rolesUser, setRolesUser] = useState<User | null>(null);
   const [currentRolesFormIds, setCurrentRolesFormIds] = useState<number[]>([]);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [totalUsers, setTotalUsers] = useState<number>(0); // Общее количество записей в базе данных
+  const [totalUsers, setTotalUsers] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const PAGE_SIZE = 20; 
-  // const PAGE_SIZE = 5; 
-
-
-  const user = useAppSelector(state => state.user);
-  useEffect(() => {
-    console.log('USER:', user)
-  }, [])
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const setAndFetchUsers = async (params = {}) => { //!!!подумать params {} или undefined 
-    // !!! не передан page
+
+
+  const setAndFetchUsers = async (params = {}) => {
     setLoading(true);
 
     try {
@@ -58,24 +55,22 @@ const UsersPage = () => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      console.log('params: ', params)
       const clearParams: Params = getClearAllValues(params) ?? {};
-      const users = await getUsers(clearParams, controller); //!!!
+      const usersInfo = await getUsers(clearParams, controller);
 
-      console.log('users: ', users);
-      dispatch(setUsers(users.data)); //!!! (в setData то же самое ниже)
-      setQweryParams(params);
-      setCurrentUsers(users.data); //setData это
+      if (usersInfo) {
+        dispatch(setUsers(usersInfo.data)); //!!! (в setData то же самое ниже)
+        setQweryParams(params);
+        setCurrentUsers(usersInfo.data); //setData это  
+        setTotalUsers(usersInfo.meta.totalAmount);   
+      }
 
-      // setData(users.data);         // !!! (в диспатче то же самое выше) Записываем массив данных
-      setTotalUsers(users.meta.totalAmount);   // Важно: бэкенд должен возвращать общее количество строк в БД
     } catch(err: unknown) {
-      if (err instanceof Error) {
-        console.log('setAndFetchUsers | axios.isCancel(err): ', axios.isCancel(err))
+      if (err instanceof Error) { //!!!
+        // console.log('setAndFetchUsers | axios.isCancel(err): ', axios.isCancel(err))
         if (axios.isCancel(err) || err?.name === 'CanceledError') { //отмена нотификации при отмене запроса
           return; 
         }
-
         openNotification({
           type: 'error',
           title: 'ERROR',
@@ -86,6 +81,9 @@ const UsersPage = () => {
       setLoading(false);
     }
   }
+  useEffect(() => {
+    setAndFetchUsers();
+  }, []);
 
   useEffect(() => {
     setAndFetchUsers({
@@ -94,6 +92,7 @@ const UsersPage = () => {
       limit: PAGE_SIZE
     }); 
   }, [currentPage, sortParams]);
+
 
   const postBlockUser = async (id: number) => {
     try {
@@ -122,17 +121,12 @@ const UsersPage = () => {
     }
   }
 
-  useEffect(() => {
-    setAndFetchUsers();
-  }, []);
-
   const handleDelete = async (user: User | null) => {
     if (user !== null) {
       const {id} = user;
       setDeletingUser(null);
   
       try {
-        console.log('delete')
         await deleteUser(id);
         await setAndFetchUsers(qweryParams);
         openNotification({
@@ -166,14 +160,12 @@ const UsersPage = () => {
     }
   }
   
-  const handleChangeRoles = async (user: User | null, newRoles: RolesValues | null) => {
-    console.log('value newRoles: ', newRoles); //newRoles //value
-    
-    if (user) { //!!! ???
+  const handleChangeRoles = async (user: User | null, newRoles: RolesValues[]) => {    
+    if (user) {
       try {
-        await changeUserRoles(user.id, newRoles); 
+        await changeUserRoles(user.id, newRoles);
         await setAndFetchUsers(qweryParams);
-        setRolesValue(null);
+        setRolesValue([]);
 
         openNotification({
           type: 'success',
@@ -196,11 +188,6 @@ const UsersPage = () => {
 
   const columns: TableProps<User>['columns'] = useMemo(() => [
     {
-      title: 'id',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
       title: 'Имя',
       dataIndex: 'username',
       key: 'username',
@@ -211,10 +198,9 @@ const UsersPage = () => {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      sorter: true, // Включает сортировку на бэкенде для этой колонки
-      sortOrder: sortParams.field === 'email' ? sortParams.order : undefined, // Управляет подсветкой стрелочек
+      sorter: true, 
+      sortOrder: sortParams.field === 'email' ? sortParams.order : undefined,
       render: (email) => <div className={s.email}>
-        {/* <LetterIcon/> */}
         {email}</div>,
     },
     {
@@ -284,30 +270,45 @@ const UsersPage = () => {
   ], [sortParams.field, sortParams.order, currentRolesFormIds]);
 
   // Функция срабатывает при клике на номера страниц внизу таблицы
-  const handleTableChange = (...args: any[]) => {
+  const handleTableChange = (...args: [
+    TablePaginationConfig,
+    Record<string, FilterValue | null>,
+    SorterResult<User> | SorterResult<User>[],
+    { action: 'paginate' | 'sort' | 'filter'; currentDataSource: User[] }
+  ]) => {
     const [pagination, , sorter] = args; //pagination, filters, sorter, служебный объект
 
-    setCurrentPage(pagination.current);
-    setSortParams({
-      field: sorter.field,
-      order: sorter.order
-    });
-
-    const getRightFormOrder = (order: 'ascend' | 'descend') => {
-      console.log('order: ', order)
-      if (order === 'ascend') {
-        return 'asc';
-      } 
-      if (order === 'descend') {
-        return 'desc';
-      }
-      return undefined;
-      // return 'none';
+    if (pagination.current) {
+      setCurrentPage(pagination.current);
     }
-    setQweryParams({...qweryParams, 
-      sortBy: sorter.field ?? 'id', 
-      sortOrder: getRightFormOrder(sorter.order),
-    })
+    
+    const isMultipleSorter = Array.isArray(sorter);
+
+    if (!isMultipleSorter) { //нет сортировки 2-3 колонок одновременно
+      
+      const getRightFormOrder = (order: SortOrder | undefined) => {
+      // const getRightFormOrder = (order: 'ascend' | 'descend' | undefined) => {
+
+        if (order === 'ascend') {
+          return 'asc';
+        } 
+        if (order === 'descend') {
+          return 'desc';
+        }
+        return undefined;
+      }
+
+
+      setSortParams({
+        field: sorter.field,
+        order: sorter.order
+      });
+  
+      setQweryParams({...qweryParams, 
+        sortBy: sorter.field as Params['sortBy'] ?? 'id', 
+        sortOrder: getRightFormOrder(sorter.order),
+      })
+    }
   };
 
   return (
@@ -319,7 +320,6 @@ const UsersPage = () => {
       <Table<User> 
         columns={columns} 
         dataSource={currentUsers || []}
-        // loading={currentUsers === null} 
         tableLayout="fixed"
 
         //пагинация
@@ -332,7 +332,6 @@ const UsersPage = () => {
           showSizeChanger: false,   // Скрывает динамический выбор (10, 20, 50)
         }} 
       />
-      {/* !!! Можно унифицировать количество передаваемых параметров ? */}
       <ConfirmModal 
         isOpen={Boolean(deletingUser)}
         user={deletingUser}
@@ -354,10 +353,10 @@ const UsersPage = () => {
           этого пользователя?`}
       />
       <ConfirmModal 
-        isOpen={Boolean(rolesValue)}
+        isOpen={Boolean(Array.isArray(rolesValue) && rolesValue.length !== 0)}
         user={rolesUser}
         onClose={() => {
-          setRolesValue(null);
+          setRolesValue([]);
           setRolesUser(null);
         }}
         onConfirm={() => handleChangeRoles(rolesUser, rolesValue)}

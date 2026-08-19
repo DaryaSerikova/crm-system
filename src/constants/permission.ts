@@ -2,13 +2,12 @@ import type { RolesValues, PermissionActionValues } from "@/types/admin.types";
 
 
 export enum PermissionAction {
-  UserView = 'user.view', //moder, ad // короче user'ам нельзя
-  UserEdit = 'user.edit', //moder ad
-  UserDelete = 'user.delete', //ad
-  // UserFilter = 'user.filter', //moder ad ??? вообще нужен?
-  UserBlock = 'user.block', //moder ad чет я запуталась тут
-  UserBlockFilter = 'user.block.filter',
-  UserRoles = 'user.roles', //ad 
+  UserView = 'user.view',
+  UserEdit = 'user.edit',
+  UserDelete = 'user.delete', 
+  UserBlock = 'user.block', //доступно блокировать/разблокировать юзера
+  UserBlockFilter = 'user.block.filter', //доступна фильтрация по блокировке
+  UserRoles = 'user.roles', 
 }
 
 
@@ -16,12 +15,10 @@ type PermissionMap = {
   [K in PermissionActionValues]: RolesValues[];
 }
 
-export const PERMISSIONS_MAP: PermissionMap = { //пересмотреть
+export const PERMISSIONS_MAP: PermissionMap = {
   'user.view': ['ADMIN', 'MODERATOR'],
   'user.edit': ['ADMIN', 'MODERATOR'],
   'user.delete': ['ADMIN'],
-
-  // 'user.filter': 
   'user.block': ['ADMIN', 'MODERATOR'],
   'user.block.filter': ['ADMIN'],
   'user.roles': ['ADMIN'],

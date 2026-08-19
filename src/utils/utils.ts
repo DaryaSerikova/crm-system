@@ -32,15 +32,14 @@ export const getHumanDate = (dateString: string) => {
   })
 }
 
-export const getHumanPhone = (phone: string) => 
+export const getHumanPhone = (phone: string): string => 
   phone 
     ? `${phone.slice(0,2)} (${phone.slice(2,5)}) ${phone.slice(5,8)}-${phone.slice(8)}`
     : '';
 
-export const getClearAllValues = (params: Params) => { //!!! типизировать
+export const getClearAllValues = (params: Params): Params => {
   const result: Partial<Record<keyof Params, Params[keyof Params]>> = {};
   // const result: Params = {};
-  
   
   for (let [key, value] of Object.entries(params)) {
     const paramKey = key as keyof Params;
@@ -71,18 +70,8 @@ export const getClearAllValues = (params: Params) => { //!!! типизиров�
         break;
       
       default: 
-        return;
+        break;
     }
-  
-    // if (paramKey !== 'isBlocked' && typeof value === 'string'  && !!value?.trim()) {
-    //   result[paramKey] = value?.trim();
-    // }
-    // if (paramKey === 'isBlocked' && typeof value === 'boolean') {
-    //   result[paramKey] = value;
-    // }
-    // if (typeof value === 'number') {
-    //   result[paramKey] = value;
-    // }
   }
 
   return result as Params;

@@ -61,10 +61,6 @@ const RegisterPage = () => {
     }
 
   };
-  
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
 
   return (
     <div className={s.register}>
@@ -79,7 +75,6 @@ const RegisterPage = () => {
           className={s.registerForm}
           name="register"
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
         >
           <Item<FieldType>
             label="Имя пользователя"

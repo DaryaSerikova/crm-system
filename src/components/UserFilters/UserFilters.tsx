@@ -1,9 +1,9 @@
 import { Select, Input, Form, } from 'antd';
 import type { Params } from '@/types/admin.types';
-import { useDebounceCallback } from '@/utils/hooks/useDebounceCallback';
-import s from './UserFilters.module.scss';
 import PermissionGuard from '../PermissionGuard/PermissionGuard';
+import { useDebounceCallback } from '@/utils/hooks/useDebounceCallback';
 import { PermissionAction } from '@/constants/permission';
+import s from './UserFilters.module.scss';
 
 
 
@@ -18,9 +18,6 @@ const UserFilters = ({setAndFetchUsers}: UserFiltersProps) => {
   const debouncedGetAndFetchUsers = useDebounceCallback(setAndFetchUsers, 400);
 
   const handleValuesChange = (changedValues: Params, allValues: Params) => {
-    console.log('changedValues: ', changedValues);
-    console.log('allValues: ', allValues)
-
     if ('search' in changedValues) { //только для инпута debounce
       debouncedGetAndFetchUsers(allValues);
     } else {

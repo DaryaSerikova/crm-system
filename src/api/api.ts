@@ -1,10 +1,11 @@
 import type { UserRegistration, Profile, AuthData, Token } from "../types/user.types";
-import type { MetaResponse, Filter, TodoRequest, Todo, TodoInfo, } from "../types/todo.types"
+import type { Filter, TodoRequest, Todo, TodoInfo, MetaResponse as TodoMetaResponse} from "../types/todo.types"
+import type { MetaResponse as AdminMetaResponse } from "@/types/admin.types";
 import axios, { AxiosError } from 'axios';
 import { store } from '../store/store';
 import { setAuth, removeAuth } from "@/store/slices/authSlice";
 import { accessTokenManager } from "@/store/tokenStorage";
-import type { Params, User, UserRequest } from "@/types/admin.types";
+import type { Params, RolesValues, User, UserRequest } from "@/types/admin.types";
 import type { InternalAxiosRequestConfig } from "axios";
 
 const baseUrl = 'https://easydev.club/api/v1';
@@ -16,15 +17,12 @@ const api = axios.create({
 });
 
 const handleUnauthorizedError = async (error: AxiosError) => {
-  console.log('UNAUTHORIZED ERROR error: ', error)
-  console.log('UNAUTHORIZED ERROR axios.isCancel(error): ', axios.isCancel(error))
-
   if (axios.isCancel(error)) {
     return Promise.reject(error);
   }
 
   interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-    _isRetry?: boolean; // Добавляем наше кастомное свойство
+    _isRetry?: boolean;
   }
   const originalRequest = error.config as CustomAxiosRequestConfig;;
 
@@ -46,7 +44,6 @@ const handleUnauthorizedError = async (error: AxiosError) => {
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        console.log('REFRESH ERROR')
         store.dispatch(removeAuth()); //logout
         localStorage.removeItem('refreshToken');
   
@@ -73,7 +70,7 @@ api.interceptors.response.use((response) => response, //после ответа
 
 
 
-export const getAllTodos = async (filter: Filter): Promise<MetaResponse<Todo, TodoInfo>> => {
+export const getAllTodos = async (filter: Filter): Promise<TodoMetaResponse<Todo, TodoInfo>> => {
   try {
     const response = await api.get(`/todos`, {
       params: {filter: filter}
@@ -158,33 +155,28 @@ export const getUserProfile = async (): Promise<Profile | undefined> => {
 
 // ---- admin---
 
-export const getUsers = async (params: Params, controller: AbortController) => {
+export const getUsers = async (
+  params: Params, controller: AbortController): Promise<AdminMetaResponse<User> | undefined> => {
   try {
     const response = await api.get('/admin/users', {
-      params: params ,
+      params: params,
       signal: controller.signal 
     });
-    console.log('getUsers, response: ', response);
-    console.log('getUsers, response.data: ', response.data);
-
     return response.data;
   } catch (err: unknown) {
     if (err instanceof Error) {
-
-      console.log('axios.isCancel(err): ', axios.isCancel(err))
-      if (axios.isCancel(err)) {
+      if (axios.isCancel(err)) { // !!!
         throw err;
+      } else {
+        throw new Error(`Failed to get users for admin: ${err.message}`);
       }
-      throw new Error(`Failed to get users for admin: ${err.message}`);
     }
-
   }
 }
 
 export const getUser = async (id: number): Promise<User | undefined> => {
   try {
     const response = await api.get(`/admin/users/${id}`);
-    console.log('response: ', response)
     return response.data;
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -206,9 +198,7 @@ export const editUser = async (id: number, userRequest: UserRequest): Promise<Us
 
 export const deleteUser = async (id: number): Promise<void> => {
   try {
-    // id = undefined;
     await api.delete(`/admin/users/${id}`)
-
   } catch (err: unknown) {
     if (err instanceof Error) {
       throw new Error(`Failed to delete user: ${err.message}`)
@@ -216,11 +206,9 @@ export const deleteUser = async (id: number): Promise<void> => {
   }
 } 
 
-export const blockUser = async (id: number): Promise<void> => { //!!! todo: типы Promise<User>
+export const blockUser = async (id: number): Promise<void> => {
   try {
-    console.log("block id: ", id);
-    const res = await api.post(`/admin/users/${id}/block`);
-    console.log('block res: ', res)
+    await api.post(`/admin/users/${id}/block`);
   } catch(err: unknown) {
     if (err instanceof Error) {
       throw new Error(`Failed to block user: ${err.message}`)
@@ -228,7 +216,7 @@ export const blockUser = async (id: number): Promise<void> => { //!!! todo: ти
   }
 }
 
-export const unblockUser = async (id: number): Promise<void> => { //!!! todo: Promise<User>
+export const unblockUser = async (id: number): Promise<void> => {
   try {
     await api.post(`/admin/users/${id}/unblock`);
   } catch (err: unknown) {
@@ -238,12 +226,9 @@ export const unblockUser = async (id: number): Promise<void> => { //!!! todo: Pr
   }
 }
 
-
-export const changeUserRoles = async (id: number, roles: any): Promise<void> => { //!!!  типы //Promise<User | undefined>
+export const changeUserRoles = async (id: number, roles: RolesValues[]): Promise<void> => { //Promise<User | undefined>
   try {
-    const response = await api.post(`/admin/users/${id}/rights`, {roles: roles});
-    console.log('changeRightsUser | response.data: ', response.data)
-    return response.data;
+    await api.post(`/admin/users/${id}/rights`, {roles: roles});
   } catch(err: unknown) {
     if (err instanceof Error) {
       throw new Error(`Failed to change rights for user ${id}: ${err.message}`);

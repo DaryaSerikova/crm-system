@@ -40,16 +40,11 @@ const AddTodo = ({ onUpdate }: AddTodoProps) => {
     }
   };
   
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('onFinishFailed Failed:', errorInfo);
-  };
-  
   return (
     <Form
       form={form}
       name="add-todo"
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
     >
       <Flex gap={10} align="center">
         <Item<FieldType>

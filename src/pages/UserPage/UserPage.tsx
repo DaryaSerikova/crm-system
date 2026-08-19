@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router';
-import { getUser } from '../../api/api';
+import { useParams, Link } from 'react-router';
+import { Button, Form, Input } from 'antd';
+import type { FormProps } from 'antd';
 import type { User, UserRequest } from '../../types/admin.types';
 import { openNotification } from '@/utils/errors';
-import { Link } from 'react-router';
-import type { FormProps } from 'antd';
-import { Button, Form, Input } from 'antd';
-import { editUser } from '../../api/api';
-import s from './UserPage.module.scss';
+import { getUser, editUser } from '../../api/api';
 import PermissionGuard from '@/components/PermissionGuard/PermissionGuard';
 import { PermissionAction } from '@/constants/permission';
+import s from './UserPage.module.scss';
+
 
 type FieldType = {
   username?: string;
   email?: string;
-  phoneNumber: string;
-};
-
+  phoneNumber?: string;
+}; 
+// !!! Partial<Pick<User, "username" | "email" | "phoneNumber">>
 
 const UserPage = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -25,8 +24,6 @@ const UserPage = () => {
 
   const { Item } = Form;
   const { id } = useParams();
-  console.log('id: ', id);
-
 
   const fetchAndSetUser = async (id: number) => {
     try {
@@ -56,11 +53,11 @@ const UserPage = () => {
   }, []);
 
   const onFinish: FormProps<FieldType>['onFinish'] = async (values: UserRequest) => {
-    console.log('Success:', values);
-
-    if (values.username === currentUser?.username 
+    const isFormNotChanged = values.username === currentUser?.username 
       && values.email === currentUser?.email
-      && values.phoneNumber === currentUser?.phoneNumber) {
+      && values.phoneNumber === currentUser?.phoneNumber;
+
+    if (isFormNotChanged) {
       setIsEdit(false);
       return;
     }
@@ -77,9 +74,7 @@ const UserPage = () => {
 
     if(id){
       try{
-        // const response = await editUser(+id, values);
         const response = await editUser(+id, changedValues);
-        console.log('res edit: ', response);
         setCurrentUser(response ?? null);
         setIsEdit(false);
       } catch(err: unknown) {
@@ -93,10 +88,6 @@ const UserPage = () => {
       }
     }
     
-  };
-  
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
   };
 
 
@@ -125,7 +116,6 @@ const UserPage = () => {
           }}
           layout="horizontal"
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
         >
           <Item<FieldType>
             label="Имя пользователя"
@@ -159,7 +149,6 @@ const UserPage = () => {
         </Form>}
 
         <Link to={'/users'}>
-          {/* <Button>К таблице пользователей</Button> */}
           <Button>Вернуться</Button>
         </Link>
       </section>

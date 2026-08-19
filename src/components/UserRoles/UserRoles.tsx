@@ -1,24 +1,26 @@
 import React, { type SetStateAction } from 'react';
 import { Form, Select, Button, Tag } from 'antd';
-import { usePermission } from '@/utils/hooks/usePermission';
-import { PermissionAction } from '@/constants/permission';
+import type { SelectProps } from 'antd';
 import type { RolesValues, User } from '@/types/admin.types';
 import { Roles } from '@/types/admin.types';
+import { usePermission } from '@/utils/hooks/usePermission';
+import { PermissionAction } from '@/constants/permission';
 import { deleteIdFromRoles } from '@/utils/utils';
-import type { SelectProps } from 'antd';
 
 
 type TagRender = SelectProps['tagRender'];
 type RoleColors = {
-  user: string,
-  admin: string,
-  moderator: string,
-}
+  USER: string,
+  ADMIN: string,
+  MODERATOR: string,
+} 
+//Record<"USER" | "ADMIN" | "MODERATOR", string> !!!
+//Record<RolesValues, string>
 
 const roleColors: RoleColors = {
-  user: 'purple',
-  admin: 'blue',
-  moderator: 'orange',
+  USER: 'purple',
+  ADMIN: 'blue',
+  MODERATOR: 'orange',
 }
   
 const tagRender: TagRender = (props) => {
@@ -29,7 +31,7 @@ const tagRender: TagRender = (props) => {
   };
 
   const labelStr = typeof label === 'string' ? label : String(label);
-  const key = labelStr.toLowerCase() as keyof RoleColors;
+  const key = labelStr as keyof RoleColors;
 
   return (
     <Tag
@@ -49,7 +51,7 @@ interface UserRolesProps {
   roles: RolesValues[],
   currentRolesFormIds: number[],
   setCurrentRolesFormIds: React.Dispatch<SetStateAction<number[]>>,
-  setRolesValue: React.Dispatch<SetStateAction<RolesValues | null>>,
+  setRolesValue: React.Dispatch<SetStateAction<RolesValues[]>>,
   setRolesUser: React.Dispatch<SetStateAction<User | null>>,
 }
 
@@ -73,7 +75,6 @@ const UserRoles = ({
   ? <Form
       key={user.id}
       preserve={false}
-      // initialValues={{ roles: rolesValue ?? roles }} 
       initialValues={{roles: roles}}
       onFinish={(values) => {
         setRolesValue(values.roles);
@@ -94,20 +95,14 @@ const UserRoles = ({
       >Отмена</Button>
     </Form>
   : <>
-  {roles.map((role: RolesValues) => {
-    const key = role.toLowerCase() as keyof RoleColors;
-    return(
-      <Tag 
-        key={role} 
-        color={roleColors[key]} 
-        // variant='solid'
-      >
-        {role}
-      </Tag>
-    )
-  }
-
-  )}
+  {roles.map((role: RolesValues) => (
+    <Tag 
+      key={role} 
+      color={roleColors[role]} 
+    >
+      {role}
+    </Tag>
+  ))}
   <Button onClick={() => 
     setCurrentRolesFormIds([
       ...currentRolesFormIds, 

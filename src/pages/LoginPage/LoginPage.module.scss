@@ -12,18 +12,8 @@
   flex-direction: column;
   height: 100vh;
   width: 811px;
-  // justify-content: center;
   align-items: center;
   justify-content: space-around;
-  // gap: 317px;
-  // gap: 30vh;
-
-  // @media (min-width: 1200px) {
-    // gap: 0;
-    // align-items: stretch;
-  // }
-
-
 
   .card {
     width: 420px;
@@ -31,8 +21,6 @@
     flex-direction: column;
     align-items: center;
     gap: 36px;
-
-  
 
     .header {
       width: 100%;
